@@ -5,6 +5,7 @@ import Main from "../Layout/Main";
 import Home from "../Pages/Home/Home";
 import Login from "../Pages/Login/Login";
 import PrivateRoute from "./PrivateRoute";
+import PrimaryLoader from "../components/PrimaryLoader/PrimaryLoader";
 const Sell = lazy(() => import("../Pages/Sell/Sell"));
 const SelectOrders = lazy(() => import("../Pages/SelectOrders/SelectOrders"));
 const Dashboard = lazy(() => import("../Pages/Dashboard/Dashboard"));
@@ -50,7 +51,7 @@ export const router = createBrowserRouter([
       {
         path: "/sell",
         element: (
-          <Suspense fallback={<h1 className="text-center">Loading...</h1>}>
+          <Suspense fallback={<PrimaryLoader />}>
             <Sell />
           </Suspense>
         ),
@@ -58,7 +59,7 @@ export const router = createBrowserRouter([
       {
         path: "/sell/:name",
         element: (
-          <Suspense fallback={<h1 className="text-center">Loading...</h1>}>
+          <Suspense fallback={<PrimaryLoader />}>
             <SelectOrders />
           </Suspense>
         ),
@@ -66,7 +67,7 @@ export const router = createBrowserRouter([
       {
         path: "/dashboard",
         element: (
-          <Suspense fallback={<h1 className="text-center">Loading...</h1>}>
+          <Suspense fallback={<PrimaryLoader />}>
             <Dashboard />
           </Suspense>
         ),
@@ -74,7 +75,7 @@ export const router = createBrowserRouter([
           {
             path: "inventory",
             element: (
-              <Suspense fallback={<h1 className="text-center">Loading...</h1>}>
+              <Suspense fallback={<PrimaryLoader />}>
                 <Inventory />
               </Suspense>
             ),
@@ -82,7 +83,7 @@ export const router = createBrowserRouter([
           {
             path: "sell-report",
             element: (
-              <Suspense fallback={<h1 className="text-center">Loading...</h1>}>
+              <Suspense fallback={<PrimaryLoader />}>
                 <SellReport />
               </Suspense>
             ),
@@ -90,7 +91,7 @@ export const router = createBrowserRouter([
           {
             path: "features",
             element: (
-              <Suspense fallback={<h1 className="text-center">Loading...</h1>}>
+              <Suspense fallback={<PrimaryLoader />}>
                 <Features />
               </Suspense>
             ),
@@ -98,9 +99,7 @@ export const router = createBrowserRouter([
               {
                 path: "maintain-tables",
                 element: (
-                  <Suspense
-                    fallback={<h1 className="text-center">Loading...</h1>}
-                  >
+                  <Suspense fallback={<PrimaryLoader />}>
                     <MaintainTables />
                   </Suspense>
                 ),
@@ -108,9 +107,7 @@ export const router = createBrowserRouter([
               {
                 path: "maintain-fast-food",
                 element: (
-                  <Suspense
-                    fallback={<h1 className="text-center">Loading...</h1>}
-                  >
+                  <Suspense fallback={<PrimaryLoader />}>
                     <MaintainFastFood />
                   </Suspense>
                 ),
@@ -118,9 +115,7 @@ export const router = createBrowserRouter([
               {
                 path: "maintain-drinks-and-juices",
                 element: (
-                  <Suspense
-                    fallback={<h1 className="text-center">Loading...</h1>}
-                  >
+                  <Suspense fallback={<PrimaryLoader />}>
                     <MaintainDrinksAndJuices />
                   </Suspense>
                 ),
@@ -128,9 +123,7 @@ export const router = createBrowserRouter([
               {
                 path: "maintain-vegetables-and-Rice",
                 element: (
-                  <Suspense
-                    fallback={<h1 className="text-center">Loading...</h1>}
-                  >
+                  <Suspense fallback={<PrimaryLoader />}>
                     <MaintainVegetablesAndRices />
                   </Suspense>
                 ),
@@ -138,9 +131,7 @@ export const router = createBrowserRouter([
               {
                 path: "maintain-users",
                 element: (
-                  <Suspense
-                    fallback={<h1 className="text-center">Loading...</h1>}
-                  >
+                  <Suspense fallback={<PrimaryLoader />}>
                     <MaintainUsers />
                   </Suspense>
                 ),

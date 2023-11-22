@@ -2,13 +2,14 @@
 import { Navigate, useLocation } from "react-router-dom";
 import { useContext } from "react";
 import { AuthContext } from "../GlobalContext/AuthProvider";
+import PrimaryLoader from "../components/PrimaryLoader/PrimaryLoader";
 
 const PrivateRoute = ({ children }) => {
   const { user, loading } = useContext(AuthContext);
   const location = useLocation();
 
   if (loading) {
-    return <h1>Please wait...</h1>;
+    return <PrimaryLoader />;
   }
   if (user) {
     return children;
