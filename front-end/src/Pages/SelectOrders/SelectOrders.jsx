@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import CurrencyFormatter from "../../components/CurrencyFormatter/CurrencyFormatter";
 import { useItemsContext } from "../../GlobalContext/ItemsContext";
 import HyphenToSpaceConverter from "../../components/HyphenToSpaceConverter/HyphenToSpaceConverter";
@@ -8,6 +8,9 @@ import { useCartContext } from "../../GlobalContext/CartContext";
 import { MdDelete } from "react-icons/md";
 import { MdCancel } from "react-icons/md";
 import ReactToPrint from "react-to-print";
+import DateFormatter from "../../components/DateFormatter/DateFormatter";
+import Swal from "sweetalert2";
+import axios from "axios";
 
 const SelectOrders = () => {
   const { name } = useParams();
@@ -17,6 +20,21 @@ const SelectOrders = () => {
   const { drinksAndJuices, fastFood, vegetablesAndRices } = useItemsContext();
   const { handleAddToBill, carts, itemRemove } = useCartContext();
   const componentRef = useRef();
+  const navigate = useNavigate();
+
+  //carts items sum calculation
+  const totalPrice = carts?.reduce((sum, currentItem) => {
+    const itemTotal =
+      currentItem.item_price_per_unit * currentItem.item_quantity;
+    return sum + itemTotal;
+  }, 0);
+
+  const handleSingleItemRemove = (item) => {
+    if (carts.length === 1) {
+      window.location.reload();
+    }
+    itemRemove(item);
+  };
 
   const totalQuantity =
     tableWiseCart?.length > 0
@@ -38,20 +56,53 @@ const SelectOrders = () => {
   };
 
   // handle sell
-  const handleSell = (invoiceData) => {
-    console.log(invoiceData);
+  const handleSell = (invoiceData, tableName) => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: `Total bill: ${totalPrice} TK.`,
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonColor: "#001529",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        const soldItems = {
+          table_name: tableName,
+          items: invoiceData,
+        };
+        axios
+          .post(
+            `${import.meta.env.VITE_API_URL}/api/post-sold-invoices`,
+            soldItems
+          )
+          .then((res) => {
+            if (res?.data?.insertedId) {
+              Swal.fire({
+                title: "Success!",
+                html: `Items have been sold<br>ID: ${res.data.insertedId}`,
+                icon: "success",
+              });
+              navigate(`${res.data.insertedId}`);
+            }
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      }
+    });
   };
 
   useEffect(() => {
     filterTableData(name);
-  }, [name, handleAddToBill, itemRemove]);
+  }, [name, handleAddToBill, itemRemove, carts]);
   return (
     <div>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="py-1 px-2 bg-slate-300 text-lg font-semibold rounded-md flex"
+        className="py-2 px-2 bg-slate-400 text-lg font-semibold rounded-md flex sticky top-6 z-50"
       >
-        Click Invoice{" "}
+        Check Invoice{" "}
         <p className="ml-2 px-2 bg-blue-300 rounded-full">{totalQuantity}</p>
       </button>
       <h1 className="capitalize font-bold text-center text-2xl mb-4 mt-0 text-[#001529]">
@@ -76,7 +127,7 @@ const SelectOrders = () => {
                     <p className="mr-1">{index + 1}.</p>
                   </div>
                   <div>
-                    <p className="">
+                    <p className="wrapped-text">
                       <HyphenToSpaceConverter inputString={item?.item_name} />
                     </p>
                   </div>
@@ -111,7 +162,7 @@ const SelectOrders = () => {
                     <p className="mr-1">{index + 1}.</p>
                   </div>
                   <div>
-                    <p className="capitalize">
+                    <p className="capitalize wrapped-text">
                       <HyphenToSpaceConverter inputString={item?.item_name} />
                     </p>
                   </div>
@@ -146,7 +197,7 @@ const SelectOrders = () => {
                     <p className="mr-1">{index + 1}.</p>
                   </div>
                   <div>
-                    <p className="capitalize">
+                    <p className="capitalize wrapped-text">
                       <HyphenToSpaceConverter inputString={item.item_name} />
                     </p>
                   </div>
@@ -219,10 +270,10 @@ const SelectOrders = () => {
                             .map((item, index) => (
                               <div
                                 key={item._id}
-                                className="h-[50px] w-full border-b border-gray-300 shadow-md flex items-center"
+                                className="min-h-[50px] w-full border-b border-gray-300 shadow-md flex items-center py-2"
                               >
                                 <p>{index + 1}.</p>
-                                <p>
+                                <p className="wrapped-text">
                                   <HyphenToSpaceConverter
                                     inputString={item.item_name}
                                   />
@@ -242,7 +293,7 @@ const SelectOrders = () => {
                                 </div>
                                 <div className="">
                                   <MdDelete
-                                    onClick={() => itemRemove(item)}
+                                    onClick={() => handleSingleItemRemove(item)}
                                     className="text-red-700 h-6 w-6 cursor-pointer mx-4"
                                   />
                                 </div>
@@ -255,6 +306,14 @@ const SelectOrders = () => {
                         </div>
                       )}
                     </div>
+                    <div>
+                      <h1 className="flex justify-end font-bold text-lg mt-2">
+                        Total Bill:{" "}
+                        <span className="ml-4">
+                          <CurrencyFormatter value={totalPrice} />
+                        </span>
+                      </h1>
+                    </div>
                   </div>
                   {tableWiseCart?.length > 0 ? (
                     <div className="text-center space-x-4 my-4">
@@ -265,7 +324,7 @@ const SelectOrders = () => {
                         Demo Invoice
                       </button>
                       <button
-                        onClick={() => handleSell(tableWiseCart)}
+                        onClick={() => handleSell(tableWiseCart, name)}
                         className="h-[40px] w-[130px] bg-purple-800 rounded-md text-white"
                       >
                         Final Invoice
@@ -308,7 +367,7 @@ const SelectOrders = () => {
                 leaveFrom="opacity-100 scale-100"
                 leaveTo="opacity-0 scale-95"
               >
-                <Dialog.Panel className="w-full max-w-sm transform overflow-hidden rounded-md bg-white text-left align-middle shadow-xl transition-all relative">
+                <Dialog.Panel className="w-full max-w-[310px] transform overflow-hidden rounded-md bg-white text-left align-middle shadow-xl transition-all relative">
                   <div ref={componentRef} className="p-4 min-h-[400px]">
                     <h1 className="text-center font-bold text-xl">
                       Food Republic
@@ -316,6 +375,9 @@ const SelectOrders = () => {
                     <h1 className="text-center font-semibold text-base mb-4 capitalize">
                       {name}
                     </h1>
+                    <p className="text-center text-[10px]">
+                      <DateFormatter dateString={new Date()} />
+                    </p>
                     <div>
                       <div>
                         {tableWiseCart
@@ -325,10 +387,10 @@ const SelectOrders = () => {
                           .map((item, index) => (
                             <div
                               key={item._id}
-                              className="h-[50px] w-full border-b border-gray-300 flex items-center"
+                              className="min-h-[50px] w-full border-b border-gray-300 flex items-center"
                             >
                               <p className="text-xs">{index + 1}.</p>
-                              <p className="text-xs">
+                              <p className="text-xs wrapped-text">
                                 <HyphenToSpaceConverter
                                   inputString={item.item_name}
                                 />
@@ -364,21 +426,3 @@ const SelectOrders = () => {
 };
 
 export default SelectOrders;
-
-// Swal.fire({
-//   title: "Are you sure?",
-//   text: "You won't be able to revert this!",
-//   icon: "warning",
-//   showCancelButton: true,
-//   confirmButtonColor: "#3085d6",
-//   cancelButtonColor: "#d33",
-//   confirmButtonText: "Yes, delete it!"
-// }).then((result) => {
-//   if (result.isConfirmed) {
-//     Swal.fire({
-//       title: "Deleted!",
-//       text: "Your file has been deleted.",
-//       icon: "success"
-//     });
-//   }
-// });

@@ -27,6 +27,11 @@ const Features = () => {
       title: "Maintain Users",
       link: "maintain-users",
     },
+    {
+      id: 6,
+      title: "Maintain Void",
+      link: "maintain-void",
+    },
   ];
 
   return (

@@ -5,7 +5,7 @@ const CartContext = createContext();
 
 //getting carts data from local storage
 const getLocalStorageCartData = () => {
-  let localStorageCartData = localStorage.getItem("bill-cart");
+  let localStorageCartData = localStorage.getItem("fr-bill-cart");
   // if our first carts value empty then set empty array
   if (localStorageCartData == "undefined" || localStorageCartData === null) {
     return [];
@@ -34,13 +34,13 @@ const CartProvider = ({ children }) => {
     dispatch({ type: "REMOVE_SINGLE_ITEM", payload: item });
   };
 
-  //   const handleRemoveAllSoldCart = () => {
-  //     dispatch({ type: "REMOVE_CART" });
-  //   };
+  const handleRemoveAllSoldCart = () => {
+    dispatch({ type: "REMOVE_CART" });
+  };
 
   //add cart data inside local storage
   useEffect(() => {
-    localStorage.setItem("bill-cart", JSON.stringify(state.carts));
+    localStorage.setItem("fr-bill-cart", JSON.stringify(state.carts));
   }, [state.carts]);
 
   return (
@@ -49,7 +49,7 @@ const CartProvider = ({ children }) => {
         ...state,
         handleAddToBill,
         itemRemove,
-        // handleRemoveAllSoldCart,
+        handleRemoveAllSoldCart,
       }}
     >
       {children}

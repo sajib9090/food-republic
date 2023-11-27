@@ -158,7 +158,7 @@ const MaintainDrinksAndJuices = () => {
               >
                 <div className="flex ml-2 font-semibold">
                   <p>{index + 1}.</p>
-                  <p>
+                  <p className="wrapped-text2">
                     <HyphenToSpaceConverter inputString={item.item_name} />
                   </p>
                 </div>

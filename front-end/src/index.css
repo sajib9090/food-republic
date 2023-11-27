@@ -15,3 +15,20 @@
   background-repeat: no-repeat;
   background-size: cover;
 }
+
+.wrapped-text {
+  word-wrap: break-word;
+  max-width: 25ch;
+}
+.wrapped-text2 {
+  word-wrap: break-word;
+  max-width: 45ch;
+}
+.wrapped-text3 {
+  word-wrap: break-word;
+  max-width: 18ch;
+}
+.wrapped-text4 {
+  word-wrap: break-word;
+  max-width: 60ch;
+}

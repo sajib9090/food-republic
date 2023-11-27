@@ -33,6 +33,22 @@ const MaintainVegetablesAndRices = lazy(() =>
     "../Pages/Dashboard/Features/MaintainVegetablesAndRices/MaintainVegetablesAndRices"
   )
 );
+const SoldInvoice = lazy(() => import("../Pages/SoldInvoice/SoldInvoice"));
+const MaintainVoid = lazy(() =>
+  import("../Pages/Dashboard/Features/MaintainVoid/MaintainVoid")
+);
+const SellCalculation = lazy(() =>
+  import("../Pages/Dashboard/SellReport/SellCalculation/SellCalculation")
+);
+const VoidCalculation = lazy(() =>
+  import("../Pages/Dashboard/SellReport/VoidCalculation/VoidCalculation")
+);
+const FindSellInvoice = lazy(() =>
+  import("../Pages/Dashboard/SellReport/FindSendInvoice/FindSellInvoice")
+);
+const FindVoidInvoice = lazy(() =>
+  import("../Pages/Dashboard/SellReport/FindVoidInvoice/FindVoidInvoice")
+);
 
 export const router = createBrowserRouter([
   {
@@ -65,6 +81,14 @@ export const router = createBrowserRouter([
         ),
       },
       {
+        path: "/sell/:name/:id",
+        element: (
+          <Suspense fallback={<PrimaryLoader />}>
+            <SoldInvoice />
+          </Suspense>
+        ),
+      },
+      {
         path: "/dashboard",
         element: (
           <Suspense fallback={<PrimaryLoader />}>
@@ -87,6 +111,40 @@ export const router = createBrowserRouter([
                 <SellReport />
               </Suspense>
             ),
+            children: [
+              {
+                path: "sell-calculation",
+                element: (
+                  <Suspense fallback={<PrimaryLoader />}>
+                    <SellCalculation />
+                  </Suspense>
+                ),
+              },
+              {
+                path: "void-calculation",
+                element: (
+                  <Suspense fallback={<PrimaryLoader />}>
+                    <VoidCalculation />
+                  </Suspense>
+                ),
+              },
+              {
+                path: "find-sell-invoice",
+                element: (
+                  <Suspense fallback={<PrimaryLoader />}>
+                    <FindSellInvoice />
+                  </Suspense>
+                ),
+              },
+              {
+                path: "find-void-invoice",
+                element: (
+                  <Suspense fallback={<PrimaryLoader />}>
+                    <FindVoidInvoice />
+                  </Suspense>
+                ),
+              },
+            ],
           },
           {
             path: "features",
@@ -133,6 +191,14 @@ export const router = createBrowserRouter([
                 element: (
                   <Suspense fallback={<PrimaryLoader />}>
                     <MaintainUsers />
+                  </Suspense>
+                ),
+              },
+              {
+                path: "maintain-void",
+                element: (
+                  <Suspense fallback={<PrimaryLoader />}>
+                    <MaintainVoid />
                   </Suspense>
                 ),
               },
