@@ -38,6 +38,12 @@ async function run() {
     const VegetablesAndRicesCollection = client
       .db("FoodRepublic")
       .collection("vegetables-rices");
+    const SoldItemsCollection = client
+      .db("FoodRepublic")
+      .collection("sold-invoices");
+    const VoidInvoicesCollection = client
+      .db("FoodRepublic")
+      .collection("void-invoices");
 
     // API endpoint to get the list of tables from the collection
     //user
@@ -334,6 +340,151 @@ async function run() {
       } catch (error) {
         console.error(error);
         res.status(500).json({ error: "Internal Server Error" });
+      }
+    });
+
+    //sold invoice api
+
+    app.get("/api/get-sold-invoices", async (req, res) => {
+      const invoiceId = req.query.id;
+
+      try {
+        if (invoiceId) {
+          // If ID is provided in the query, retrieve a specific sold invoice
+          const objectId = new ObjectId(invoiceId);
+          const soldInvoice = await SoldItemsCollection.findOne({
+            _id: objectId,
+          });
+
+          if (!soldInvoice) {
+            return res.status(404).json({
+              message: "Sold invoice not found",
+            });
+          }
+
+          return res.json({
+            message: "Sold invoice retrieved successfully",
+            soldInvoice,
+          });
+        } else {
+          // If no ID is provided, retrieve all sold invoices
+          const allSoldInvoices = await SoldItemsCollection.find().toArray();
+
+          return res.json({
+            message: "All sold invoices retrieved successfully",
+            allSoldInvoices,
+          });
+        }
+      } catch (error) {
+        console.error("Database Retrieval Error:", error);
+        res
+          .status(500)
+          .send("Error retrieving sold invoice(s) from the database");
+      }
+    });
+    app.patch(
+      "/api/patch-sold-invoices-update-item-quantity",
+      async (req, res) => {
+        const { invoiceId, itemId, newQuantity } = req.body;
+
+        try {
+          const objectId = new ObjectId(invoiceId);
+          const soldInvoice = await SoldItemsCollection.findOne({
+            _id: objectId,
+          });
+
+          if (!soldInvoice) {
+            return res.status(404).json({
+              message: "Sold invoice not found",
+            });
+          }
+
+          const updatedItems = soldInvoice.items.map((item) => {
+            if (item._id.toString() === itemId) {
+              return {
+                ...item,
+                item_quantity: newQuantity,
+                void: true,
+              };
+            }
+            return item;
+          });
+
+          const updatedInvoice = await SoldItemsCollection.findOneAndUpdate(
+            { _id: objectId },
+            { $set: { items: updatedItems } },
+            { returnDocument: "after" }
+          );
+
+          return res.json({
+            message: "Item quantity updated successfully",
+            updatedInvoice,
+          });
+        } catch (error) {
+          console.error("Database Update Error:", error);
+          res.status(500).send("Error updating item quantity in the database");
+        }
+      }
+    );
+
+    app.post("/api/post-sold-invoices", async (req, res) => {
+      const { table_name, items } = req.body;
+      const createdDate = new Date();
+
+      try {
+        // Calculate the total price for each item
+        const itemsWithTotalPrice = items.map((item) => ({
+          ...item,
+          total_price: item.item_price_per_unit * item.item_quantity,
+        }));
+
+        // Insert the new document
+        const result = await SoldItemsCollection.insertOne({
+          table_name,
+          items: itemsWithTotalPrice,
+          createdDate,
+        });
+
+        res.json({
+          message: "Data added successfully",
+          insertedId: result.insertedId,
+        });
+      } catch (error) {
+        console.error("Database Insertion Error:", error);
+        res.status(500).send("Error inserting data into the database");
+      }
+    });
+
+    //
+
+    app.post("/api/post-void-invoice", async (req, res) => {
+      const {
+        sold_invoice_id,
+        table_name,
+        item,
+        previous_quantity,
+        void_quantity,
+      } = req.body;
+      const createdAt = new Date();
+
+      try {
+        // Insert the new void invoice document
+        const result = await VoidInvoicesCollection.insertOne({
+          sold_invoice_id,
+          table_name,
+          item,
+          previous_quantity,
+          void_quantity,
+          createdAt,
+        });
+
+        res.json({
+          message: "Void invoice added successfully",
+          insertedId: result.insertedId,
+        });
+      } catch (error) {
+        console.error("Database Insertion Error:", error);
+        res.status(500).send("Error inserting void invoice into the database");
       }
     });
 
