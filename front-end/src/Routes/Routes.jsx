@@ -40,9 +40,7 @@ const MaintainVoid = lazy(() =>
 const SellCalculation = lazy(() =>
   import("../Pages/Dashboard/SellReport/SellCalculation/SellCalculation")
 );
-const VoidCalculation = lazy(() =>
-  import("../Pages/Dashboard/SellReport/VoidCalculation/VoidCalculation")
-);
+
 const FindSellInvoice = lazy(() =>
   import("../Pages/Dashboard/SellReport/FindSendInvoice/FindSellInvoice")
 );
@@ -117,14 +115,6 @@ export const router = createBrowserRouter([
                 element: (
                   <Suspense fallback={<PrimaryLoader />}>
                     <SellCalculation />
-                  </Suspense>
-                ),
-              },
-              {
-                path: "void-calculation",
-                element: (
-                  <Suspense fallback={<PrimaryLoader />}>
-                    <VoidCalculation />
                   </Suspense>
                 ),
               },

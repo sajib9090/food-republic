@@ -54,7 +54,7 @@ const MaintainVoid = () => {
               table_name: findInvoice.table_name,
               item: item,
               previous_quantity: item.item_quantity,
-              void_quantity: quantity,
+              void_quantity: item.item_quantity - quantity,
             };
             axios
               .post(
@@ -147,6 +147,7 @@ const MaintainVoid = () => {
                   type="number"
                   name="quantity"
                   min="0"
+                  max={item.item_quantity}
                   required
                   disabled={voidLoading}
                   defaultValue={item.item_quantity}

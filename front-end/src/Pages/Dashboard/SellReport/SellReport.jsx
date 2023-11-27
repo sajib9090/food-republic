@@ -12,11 +12,6 @@ const SellReport = () => {
       title: "Find Sell Invoice",
       link: "find-sell-invoice",
     },
-    {
-      id: 3,
-      title: "Void Calculation",
-      link: "void-calculation",
-    },
 
     {
       id: 4,

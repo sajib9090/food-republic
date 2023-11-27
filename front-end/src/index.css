@@ -32,3 +32,7 @@
   word-wrap: break-word;
   max-width: 60ch;
 }
+.wrapped-text5 {
+  word-wrap: break-word;
+  max-width: 24ch;
+}
