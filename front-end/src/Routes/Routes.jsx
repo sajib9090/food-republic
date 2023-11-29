@@ -47,6 +47,12 @@ const FindSellInvoice = lazy(() =>
 const FindVoidInvoice = lazy(() =>
   import("../Pages/Dashboard/SellReport/FindVoidInvoice/FindVoidInvoice")
 );
+const AddDailyExpenses = lazy(() =>
+  import("../Pages/Dashboard/Inventory/AddDailyExpenses/AddDailyExpenses")
+);
+const FindExpenses = lazy(() =>
+  import("../Pages/Dashboard/Inventory/FindExpenses/FindExpenses")
+);
 
 export const router = createBrowserRouter([
   {
@@ -101,6 +107,24 @@ export const router = createBrowserRouter([
                 <Inventory />
               </Suspense>
             ),
+            children: [
+              {
+                path: "add-daily-expenses",
+                element: (
+                  <Suspense fallback={<PrimaryLoader />}>
+                    <AddDailyExpenses />
+                  </Suspense>
+                ),
+              },
+              {
+                path: "find-expenses",
+                element: (
+                  <Suspense fallback={<PrimaryLoader />}>
+                    <FindExpenses />
+                  </Suspense>
+                ),
+              },
+            ],
           },
           {
             path: "sell-report",

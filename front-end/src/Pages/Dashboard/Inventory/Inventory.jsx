@@ -1,10 +1,45 @@
-import CurrencyFormatter from "../../../components/CurrencyFormatter/CurrencyFormatter";
-import DateFormatter from "../../../components/DateFormatter/DateFormatter";
-import HyphenToSpaceConverter from "../../../components/HyphenToSpaceConverter/HyphenToSpaceConverter";
+import { NavLink, Outlet } from "react-router-dom";
 
 const Inventory = () => {
+  const menu = [
+    {
+      id: 1,
+      title: "Add Daily Expenses",
+      link: "add-daily-expenses",
+    },
+    {
+      id: 2,
+      title: "Find Expenses",
+      link: "find-expenses",
+    },
+  ];
   return (
     <div>
+      <div className="h-[50px] w-full flex items-center justify-center border-b border-blue-200 space-x-4">
+        {menu.map((item) => (
+          <NavLink
+            to={item.link}
+            key={item.id}
+            className={({ isActive }) =>
+              isActive
+                ? "bg-blue-600 border border-blue-600 px-2 rounded-md text-white text-base"
+                : "bg-white border border-blue-600 px-2 rounded-md text-blue-600 text-base hover:bg-blue-600 hover:text-white transition-all duration-500"
+            }
+          >
+            {item.title}
+          </NavLink>
+        ))}
+      </div>
+      <div>
+        <Outlet />
+      </div>
+    </div>
+  );
+};
+
+export default Inventory;
+{
+  /* <div>
       <div className="max-w-[310px] min-h-[300px] shadow-md mx-auto rounded-md">
         <div className="text-center mt-2 border-b border-gray-500">
           <h1 className="text-2xl font-bold">Food Republic</h1>
@@ -49,8 +84,5 @@ const Inventory = () => {
           Print
         </button>
       </div>
-    </div>
-  );
-};
-
-export default Inventory;
+    </div> */
+}
