@@ -44,6 +44,7 @@ async function run() {
     const VoidInvoicesCollection = client
       .db("FoodRepublic")
       .collection("void-invoices");
+    const ExpensesCollection = client.db("FoodRepublic").collection("expenses");
 
     // API endpoint to get the list of tables from the collection
     //user
@@ -344,44 +345,81 @@ async function run() {
     });
 
     //sold invoice api
-
+    // this api can serve data by the help of id, date, start & end date, item name and month
     app.get("/api/get-sold-invoices", async (req, res) => {
       const invoiceId = req.query.id;
+      const startDate = req.query.startDate;
+      const endDate = req.query.endDate;
+      const date = req.query.date;
+      const itemName = req.query.itemName;
+      const month = req.query.month;
 
       try {
+        let query = {};
+
         if (invoiceId) {
-          // If ID is provided in the query, retrieve a specific sold invoice
-          const objectId = new ObjectId(invoiceId);
-          const soldInvoice = await SoldItemsCollection.findOne({
-            _id: objectId,
+          // If ID parameter is provided, search for void invoice by ID
+          const result = await SoldItemsCollection.findOne({
+            _id: new ObjectId(invoiceId), // Corrected variable name to invoiceId
           });
 
-          if (!soldInvoice) {
-            return res.status(404).json({
-              message: "Sold invoice not found",
-            });
+          if (!result) {
+            return res.status(404).json({ message: "Invoice not found" });
           }
 
           return res.json({
             message: "Sold invoice retrieved successfully",
-            soldInvoice,
+            soldInvoice: result,
           });
-        } else {
-          // If no ID is provided, retrieve all sold invoices
-          const allSoldInvoices = await SoldItemsCollection.find().toArray();
+        } else if (date) {
+          // If date is provided, filter by that specific date
+          // Remove the time part to filter by the entire day
+          const startOfDay = new Date(date);
+          const endOfDay = new Date(date);
+          endOfDay.setHours(23, 59, 59, 999);
 
-          return res.json({
-            message: "All sold invoices retrieved successfully",
-            allSoldInvoices,
-          });
+          query = { createdDate: { $gte: startOfDay, $lte: endOfDay } };
+        } else if (startDate && endDate) {
+          // If both startDate and endDate are provided, filter by date range
+          // Remove the time part to filter by the entire day
+          const startOfDay = new Date(startDate);
+          const endOfDay = new Date(endDate);
+          endOfDay.setHours(23, 59, 59, 999);
+
+          query = { createdDate: { $gte: startOfDay, $lte: endOfDay } };
+        } else if (month) {
+          // If month is provided, filter by that specific month
+          const startOfMonth = new Date(month);
+          startOfMonth.setDate(1); // Set the day to the first day of the month
+          startOfMonth.setHours(0, 0, 0, 0);
+
+          const endOfMonth = new Date(month);
+          endOfMonth.setMonth(endOfMonth.getMonth() + 1); // Move to the next month
+          endOfMonth.setDate(0); // Set the day to the last day of the month
+          endOfMonth.setHours(23, 59, 59, 999);
+
+          query = { createdDate: { $gte: startOfMonth, $lte: endOfMonth } };
         }
+
+        if (itemName) {
+          // If itemName is provided, add it to the query to filter by item name
+          query["items"] = { $elemMatch: { item_name: itemName } };
+        }
+
+        const soldInvoices = await SoldItemsCollection.find(query).toArray();
+
+        return res.json({
+          message: "Sold invoices retrieved successfully",
+          soldInvoices,
+        });
       } catch (error) {
         console.error("Database Retrieval Error:", error);
         res
           .status(500)
-          .send("Error retrieving sold invoice(s) from the database");
+          .send("Error retrieving sold invoices from the database");
       }
     });
+
     app.patch(
       "/api/patch-sold-invoices-update-item-quantity",
       async (req, res) => {
@@ -569,6 +607,96 @@ async function run() {
       } catch (error) {
         console.error("Database Insertion Error:", error);
         res.status(500).send("Error inserting void invoice into the database");
+      }
+    });
+    //expense api
+    app.get("/api/get-expenses", async (req, res) => {
+      try {
+        // Check if a date parameter is provided in the query
+        const { date, sortByTitle } = req.query;
+
+        let query = {};
+
+        // If date parameter is provided, add it to the query
+        if (date) {
+          query.createdDate = {
+            $gte: new Date(`${date}T00:00:00.000Z`),
+            $lt: new Date(`${date}T23:59:59.999Z`),
+          };
+        }
+
+        let expenses;
+
+        // If sortByTitle is provided, sort the expenses by title
+        if (sortByTitle) {
+          expenses = await ExpensesCollection.find(query)
+            .sort({ title: 1 })
+            .toArray();
+        } else {
+          // If no date parameter is provided, retrieve all expenses
+          expenses = await ExpensesCollection.find(query).toArray();
+        }
+
+        res.json({
+          message: `Expenses retrieved successfully`,
+          expenses,
+        });
+      } catch (error) {
+        console.error("Database Query Error:", error);
+        res.status(500).send("Error fetching expenses from the database");
+      }
+    });
+
+    app.post("/api/post-expense", async (req, res) => {
+      const { title, expense_price, creator } = req.body;
+      const createdDate = new Date();
+
+      // Extract the part of the email before @ symbol
+      const creatorPrefix = creator.split("@")[0];
+
+      // Replace spaces in the title with hyphens and convert to lowercase
+      const formattedTitle = title.replace(/\s+/g, "-").toLowerCase();
+
+      try {
+        // Insert the new expense without checking for duplicates
+        const newExpense = {
+          title: formattedTitle,
+          createdDate,
+          expense_price,
+          creator: creatorPrefix,
+        };
+
+        const result = await ExpensesCollection.insertOne(newExpense);
+        res.json({
+          message: "Expense added successfully",
+          insertedId: result.insertedId,
+        });
+      } catch (error) {
+        console.error("Database Insertion Error:", error);
+        res.status(500).send("Error inserting data into the database");
+      }
+    });
+    app.delete("/api/delete-expense", async (req, res) => {
+      try {
+        const expenseId = req.query.id;
+
+        // Validate if the provided ID is a valid MongoDB ObjectId
+        if (!ObjectId.isValid(expenseId)) {
+          return res.status(400).json({ message: "Invalid expense ID" });
+        }
+
+        const result = await ExpensesCollection.deleteOne({
+          _id: new ObjectId(expenseId),
+        });
+
+        if (result.deletedCount === 1) {
+          res.json({ message: "Expense deleted successfully" });
+        } else {
+          res.status(404).json({ message: "Expense not found" });
+        }
+      } catch (error) {
+        console.error("Database Delete Error:", error);
+        res.status(500).send("Error deleting expense from the database");
       }
     });
 
