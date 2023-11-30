@@ -75,7 +75,8 @@ const SellHistory = () => {
 
   return (
     <div>
-      <div className="max-w-xs mx-auto mt-4 flex">
+      <h1 className="text-center my-2 font-semibold">Pick a month</h1>
+      <div className="max-w-xs mx-auto flex">
         <input
           type="month"
           value={selectedMonth}
@@ -87,7 +88,7 @@ const SellHistory = () => {
           disabled={loading}
           className="h-[30px] w-[30%] border-l border-white text-white bg-blue-600 rounded-r flex items-center justify-center"
         >
-          Select{" "}
+          Search{" "}
           {loading ? (
             <RiLoader2Line className="h-5 w-5 animate-spin text-white " />
           ) : null}
@@ -100,6 +101,7 @@ const SellHistory = () => {
           </h1>
         ) : (
           <div>
+            <h1 className="text-center text-lg mt-4">{selectedMonth}</h1>
             <>
               {allItemNames ? (
                 <>
@@ -125,7 +127,7 @@ const SellHistory = () => {
                         {sellData &&
                           sellData?.map((sellDataRow, index) => (
                             <tr key={sellDataRow.itemName}>
-                              <td className="border border-gray-800 p-2">
+                              <td className="border border-gray-800 p-2 bg-purple-100">
                                 <span className="mr-2">{index + 1}.</span>
                                 {sellDataRow.itemName}
                               </td>

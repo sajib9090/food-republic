@@ -15,12 +15,15 @@ const MaintainTables = () => {
     axios
       .post(`${import.meta.env.VITE_API_URL}/api/add-table`)
       .then((res) => {
-        refetchItems();
-        setLoading(false);
+        if (res) {
+          refetchItems();
+          setLoading(false);
+        }
       })
       .catch((err) => {
-        console.log(err);
-        setLoading(false);
+        if (err) {
+          setLoading(false);
+        }
       });
   };
   const handleTableDelete = async (item) => {
@@ -30,11 +33,14 @@ const MaintainTables = () => {
         `${import.meta.env.VITE_API_URL}/api/delete-table/${item.name}`
       );
 
-      refetchItems();
-      setDeleteLoading(false);
+      if (res) {
+        refetchItems();
+        setDeleteLoading(false);
+      }
     } catch (err) {
-      console.error(err);
-      setDeleteLoading(false);
+      if (err) {
+        setDeleteLoading(false);
+      }
     }
   };
 

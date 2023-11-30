@@ -54,7 +54,20 @@ const SelectOrders = () => {
 
   const handleCart = (item, tableName) => {
     handleAddToBill(item, tableName);
-    toast.success("Successfully Added.");
+    toast.success(item.item_name + " " + "added");
+  };
+
+  //
+  // Updated handleCross function
+  const handleCross = (item) => {
+    const updatedTableWiseCart = tableWiseCart.map((cartItem) => {
+      if (cartItem._id === item._id) {
+        return { ...cartItem, showDeleteTag: !cartItem.showDeleteTag };
+      }
+      return cartItem;
+    });
+
+    setTableWiseCart(updatedTableWiseCart);
   };
 
   // handle sell
@@ -275,11 +288,11 @@ const SelectOrders = () => {
                                 className="min-h-[50px] w-full border-b border-gray-300 shadow-md flex items-center py-2"
                               >
                                 <p>{index + 1}.</p>
-                                <p className="wrapped-text">
+                                <div className="wrapped-text">
                                   <HyphenToSpaceConverter
                                     inputString={item.item_name}
                                   />
-                                </p>
+                                </div>
                                 <div className="ml-auto mr-4">
                                   <button className="px-2 text-gray-500">
                                     {item.item_quantity} piece
@@ -388,22 +401,47 @@ const SelectOrders = () => {
                           )
                           .map((item, index) => (
                             <div
+                              onClick={() => handleCross(item)}
                               key={item._id}
-                              className="min-h-[50px] w-full border-b border-gray-300 flex items-center"
+                              className="min-h-[50px] w-full border-b border-gray-300 flex items-center cursor-pointer"
                             >
                               <p className="text-xs">{index + 1}.</p>
-                              <p className="text-xs wrapped-text">
-                                <HyphenToSpaceConverter
-                                  inputString={item.item_name}
-                                />
-                              </p>
-                              <div className="ml-auto mr-4">
+                              {item.showDeleteTag ? (
+                                <del className="text-xs wrapped-text">
+                                  <HyphenToSpaceConverter
+                                    inputString={item.item_name}
+                                  />
+                                </del>
+                              ) : (
+                                <p className="text-xs wrapped-text">
+                                  <HyphenToSpaceConverter
+                                    inputString={item.item_name}
+                                  />
+                                </p>
+                              )}
+                              <div className="ml-auto mr-2">
                                 <button className="px-2 text-gray-500 text-xs">
                                   {item.item_quantity} piece
                                 </button>
                               </div>
+                              <div className="text-xs text-gray-500">
+                                <CurrencyFormatter
+                                  value={
+                                    item.item_price_per_unit *
+                                    item.item_quantity
+                                  }
+                                />
+                              </div>
                             </div>
                           ))}
+                      </div>
+                      <div className="text-lg font-semibold mt-1">
+                        <h1 className="flex justify-end">
+                          Total Price:{" "}
+                          <span className="ml-2">
+                            <CurrencyFormatter value={totalPrice} />
+                          </span>
+                        </h1>
                       </div>
                     </div>
                   </div>
