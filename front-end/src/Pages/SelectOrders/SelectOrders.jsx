@@ -11,6 +11,7 @@ import ReactToPrint from "react-to-print";
 import DateFormatter from "../../components/DateFormatter/DateFormatter";
 import Swal from "sweetalert2";
 import axios from "axios";
+import toast from "react-hot-toast";
 
 const SelectOrders = () => {
   const { name } = useParams();
@@ -53,6 +54,7 @@ const SelectOrders = () => {
 
   const handleCart = (item, tableName) => {
     handleAddToBill(item, tableName);
+    toast.success("Successfully Added.");
   };
 
   // handle sell

@@ -53,6 +53,9 @@ const AddDailyExpenses = lazy(() =>
 const FindExpenses = lazy(() =>
   import("../Pages/Dashboard/Inventory/FindExpenses/FindExpenses")
 );
+const SellHistory = lazy(() =>
+  import("../Pages/Dashboard/Features/SellHistory/SellHistory")
+);
 
 export const router = createBrowserRouter([
   {
@@ -213,6 +216,14 @@ export const router = createBrowserRouter([
                 element: (
                   <Suspense fallback={<PrimaryLoader />}>
                     <MaintainVoid />
+                  </Suspense>
+                ),
+              },
+              {
+                path: "sell-history",
+                element: (
+                  <Suspense fallback={<PrimaryLoader />}>
+                    <SellHistory />
                   </Suspense>
                 ),
               },

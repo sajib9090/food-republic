@@ -32,11 +32,21 @@ const Features = () => {
       title: "Maintain Void",
       link: "maintain-void",
     },
+    {
+      id: 7,
+      title: "Sell History",
+      link: "sell-history",
+    },
+    // {
+    //   id: 8,
+    //   title: "Expense History",
+    //   link: "expense-history",
+    // },
   ];
 
   return (
     <div>
-      <div className="h-[50px] w-full flex items-center justify-center border-b border-blue-200 space-x-4">
+      <div className="min-h-[50px] w-full flex flex-wrap gap-2 items-center justify-center border-b border-blue-200 space-x-4">
         {menu.map((item) => (
           <NavLink
             to={item.link}
