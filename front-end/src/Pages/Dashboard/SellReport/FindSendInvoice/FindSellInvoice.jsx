@@ -34,11 +34,11 @@ const FindSellInvoice = () => {
       });
   };
 
-  const totalSum = soldInvoice?.items?.reduce((sum, currentItem) => {
-    const itemTotal =
-      currentItem.item_price_per_unit * currentItem.item_quantity;
-    return sum + itemTotal;
-  }, 0);
+  // const totalSum = soldInvoice?.items?.reduce((sum, currentItem) => {
+  //   const itemTotal =
+  //     currentItem.item_price_per_unit * currentItem.item_quantity;
+  //   return sum + itemTotal;
+  // }, 0);
 
   return (
     <div>
@@ -111,12 +111,32 @@ const FindSellInvoice = () => {
                   </div>
                 ))}
             </div>
-            <div className="flex justify-end text-base font-semibold mt-2">
-              <p className="mb-8 mt-2">Grand Total:</p>
-              <div className="mr-2 ml-4 mb-8 mt-2">
-                <CurrencyFormatter value={totalSum} />
+            <div className="flex justify-end text-base font-medium mt-2">
+              <p className="mb-1 mt-2">Total Bill:</p>
+              <div className="mb-1 mr-2 ml-4 mt-2">
+                <CurrencyFormatter value={soldInvoice?.total_bill} />
               </div>
             </div>
+            {soldInvoice?.total_discount > 0 ? (
+              <>
+                <div className="flex justify-end text-base font-medium">
+                  <p className="">Total Discount:</p>
+                  <div className="mr-2 ml-4">
+                    <CurrencyFormatter value={soldInvoice?.total_discount} />
+                  </div>
+                </div>
+                <div className="flex justify-end text-lg font-bold">
+                  <p className="">Grand Total:</p>
+                  <div className="mr-2 ml-4">
+                    <CurrencyFormatter
+                      value={
+                        soldInvoice?.total_bill - soldInvoice?.total_discount
+                      }
+                    />
+                  </div>
+                </div>
+              </>
+            ) : null}
           </div>
           <div className="max-w-[310px] mx-auto text-right">
             <ReactToPrint

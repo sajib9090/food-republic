@@ -88,12 +88,30 @@ const SoldInvoice = () => {
               </div>
             ))}
         </div>
-        <div className="flex justify-end text-base font-semibold mt-2">
-          <p className="mb-8 mt-2">Grand Total:</p>
-          <div className="mr-2 ml-4 mb-8 mt-2">
+        <div className="flex justify-end text-sm font-medium mt-2">
+          <p className="mb-2">Total Bill:</p>
+          <div className="mr-2 ml-4">
             <CurrencyFormatter value={grandTotal} />
           </div>
         </div>
+        {soldInvoice?.total_discount && soldInvoice?.total_discount > 0 ? (
+          <>
+            <div className="flex justify-end text-sm font-medium">
+              <p className="mb-2">Total Discount:</p>
+              <div className="mr-2 ml-4">
+                <CurrencyFormatter value={soldInvoice?.total_discount} />
+              </div>
+            </div>
+            <div className="flex justify-end text-base font-bold">
+              <p className="mb-2">Grand Total Bill:</p>
+              <div className="mr-2 ml-4">
+                <CurrencyFormatter
+                  value={grandTotal - soldInvoice?.total_discount}
+                />
+              </div>
+            </div>
+          </>
+        ) : null}
       </div>
       <div className="max-w-[310px] mx-auto text-right">
         <button

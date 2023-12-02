@@ -42,11 +42,16 @@ const Features = () => {
       title: "Expense History",
       link: "expense-history",
     },
+    {
+      id: 9,
+      title: "Maintain Members",
+      link: "maintain-members",
+    },
   ];
 
   return (
     <div>
-      <div className="min-h-[50px] w-full flex flex-wrap gap-3 items-center justify-center border-b border-blue-200 py-2">
+      <div className="min-h-[50px] w-full flex flex-wrap gap-2 items-center justify-center border-b border-blue-200 py-2">
         {menu.map((item) => (
           <NavLink
             to={item.link}

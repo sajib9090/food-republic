@@ -12,12 +12,18 @@ import DateFormatter from "../../components/DateFormatter/DateFormatter";
 import Swal from "sweetalert2";
 import axios from "axios";
 import toast from "react-hot-toast";
+import { RiLoader2Line } from "react-icons/ri";
 
 const SelectOrders = () => {
   const { name } = useParams();
   let [isOpen, setIsOpen] = useState(false);
   let [isModalOpen, setIsModalOpen] = useState(false);
+  let [membership, setMembership] = useState(false);
+  let [loading, setLoading] = useState(false);
+  let [number, setNumber] = useState("");
   const [tableWiseCart, setTableWiseCart] = useState([]);
+  const [memberShipDiscount, setMemberShipDiscount] = useState(null);
+  const [availableDiscount, setAvailableDiscount] = useState(false);
   const { drinksAndJuices, fastFood, vegetablesAndRices } = useItemsContext();
   const { handleAddToBill, carts, itemRemove } = useCartContext();
   const componentRef = useRef();
@@ -29,6 +35,40 @@ const SelectOrders = () => {
       currentItem.item_price_per_unit * currentItem.item_quantity;
     return sum + itemTotal;
   }, 0);
+
+  const handleMemberShip = () => {
+    setNumber(number);
+    if (number) {
+      setLoading(true);
+      axios
+        .get(`${import.meta.env.VITE_API_URL}/api/get-members?search=${number}`)
+        .then((res) => {
+          if (res.data.member.discountValue) {
+            setMemberShipDiscount(res.data.member.discountValue);
+            setAvailableDiscount(true);
+          }
+        })
+        .catch((err) => {
+          if (err) {
+            setAvailableDiscount(false);
+            setMemberShipDiscount(null);
+            setTotalDiscount(0);
+          }
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    }
+  };
+
+  const [totalDiscount, setTotalDiscount] = useState(0);
+
+  const handleApply = () => {
+    if (availableDiscount && memberShipDiscount) {
+      const discount = (totalPrice * memberShipDiscount) / 100;
+      setTotalDiscount(discount);
+    }
+  };
 
   const handleSingleItemRemove = (item) => {
     if (carts.length === 1) {
@@ -74,7 +114,7 @@ const SelectOrders = () => {
   const handleSell = (invoiceData, tableName) => {
     Swal.fire({
       title: "Are you sure?",
-      text: `Total bill: ${totalPrice} TK.`,
+      text: `Want to sell those items?`,
       icon: "question",
       showCancelButton: true,
       confirmButtonColor: "#001529",
@@ -85,6 +125,8 @@ const SelectOrders = () => {
         const soldItems = {
           table_name: tableName,
           items: invoiceData,
+          total_bill: totalPrice,
+          total_discount: totalDiscount,
         };
         axios
           .post(
@@ -134,8 +176,11 @@ const SelectOrders = () => {
           {drinksAndJuices &&
             drinksAndJuices?.items?.map((item, index) => (
               <div
+                onClick={() => {
+                  handleCart(item, name);
+                }}
                 key={item?._id}
-                className="flex justify-between items-center shadow-md mt-4 pb-2 px-2 border-b border-gray-300"
+                className="flex justify-between items-center shadow-md mt-4 pb-2 px-2 border-b border-gray-300 cursor-pointer"
               >
                 <div className="flex font-bold text-black text-lg">
                   <div>
@@ -148,12 +193,7 @@ const SelectOrders = () => {
                   </div>
                 </div>
                 <div>
-                  <button
-                    onClick={() => {
-                      handleCart(item, name);
-                    }}
-                    className="bg-[#001529] hover:bg-opacity-70 px-2 py-1 text-white rounded-md"
-                  >
+                  <button className="bg-[#001529] hover:bg-opacity-70 px-2 py-1 text-white rounded-md">
                     <CurrencyFormatter value={item?.item_price} />
                   </button>
                 </div>
@@ -169,8 +209,11 @@ const SelectOrders = () => {
           {fastFood &&
             fastFood?.items?.map((item, index) => (
               <div
+                onClick={() => {
+                  handleCart(item, name);
+                }}
                 key={item._id}
-                className="flex justify-between items-center mt-4 pb-2 shadow-md px-2 border-b border-gray-300"
+                className="flex justify-between items-center mt-4 pb-2 shadow-md px-2 border-b border-gray-300 cursor-pointer"
               >
                 <div className="flex font-bold text-black text-lg">
                   <div>
@@ -183,12 +226,7 @@ const SelectOrders = () => {
                   </div>
                 </div>
                 <div>
-                  <button
-                    onClick={() => {
-                      handleCart(item, name);
-                    }}
-                    className="bg-[#714226] hover:bg-opacity-70 px-2 py-1 text-white rounded-md"
-                  >
+                  <button className="bg-[#714226] hover:bg-opacity-70 px-2 py-1 text-white rounded-md">
                     <CurrencyFormatter value={item?.item_price} />
                   </button>
                 </div>
@@ -204,8 +242,11 @@ const SelectOrders = () => {
           {vegetablesAndRices &&
             vegetablesAndRices?.items?.map((item, index) => (
               <div
+                onClick={() => {
+                  handleCart(item, name);
+                }}
                 key={item._id}
-                className="flex justify-between items-center mt-4 pb-2 shadow-md px-2 border-b border-gray-300"
+                className="flex justify-between items-center mt-4 pb-2 shadow-md px-2 border-b border-gray-300 cursor-pointer"
               >
                 <div className="flex font-bold text-black text-lg">
                   <div>
@@ -218,12 +259,7 @@ const SelectOrders = () => {
                   </div>
                 </div>
                 <div>
-                  <button
-                    onClick={() => {
-                      handleCart(item, name);
-                    }}
-                    className="bg-[#416622] hover:bg-opacity-70 px-2 py-1 text-white rounded-md"
-                  >
+                  <button className="bg-[#416622] hover:bg-opacity-70 px-2 py-1 text-white rounded-md">
                     <CurrencyFormatter value={item.item_price} />
                   </button>
                 </div>
@@ -321,14 +357,75 @@ const SelectOrders = () => {
                         </div>
                       )}
                     </div>
-                    <div>
-                      <h1 className="flex justify-end font-bold text-lg mt-2">
-                        Total Bill:{" "}
-                        <span className="ml-4">
-                          <CurrencyFormatter value={totalPrice} />
-                        </span>
-                      </h1>
-                    </div>
+                    {tableWiseCart?.length > 0 ? (
+                      <div>
+                        <div>
+                          <h1 className="flex justify-end font-medium text-lg mt-2 mb-2">
+                            Total Bill:{" "}
+                            <span className="ml-4">
+                              <CurrencyFormatter value={totalPrice} />
+                            </span>
+                          </h1>
+                          {availableDiscount ? (
+                            <div className="flex justify-end space-x-4">
+                              <button>{memberShipDiscount}%</button>
+                              <button
+                                onClick={handleApply}
+                                className="bg-gray-200 px-2 "
+                              >
+                                Apply
+                              </button>
+                            </div>
+                          ) : (
+                            <div className="flex justify-end">
+                              <p className="text-red-600">
+                                No Membership found
+                              </p>
+                            </div>
+                          )}
+                          {availableDiscount && totalDiscount ? (
+                            <div className="flex justify-end mt-2">
+                              <h1 className="flex text-lg font-extrabold">
+                                After Discount:{" "}
+                                <span className="ml-4">
+                                  <CurrencyFormatter
+                                    value={totalPrice - totalDiscount}
+                                  />
+                                </span>
+                              </h1>
+                            </div>
+                          ) : null}
+                        </div>
+                        <div>
+                          <p
+                            onClick={() => setMembership(!membership)}
+                            className="underline cursor-pointer"
+                          >
+                            Membership offer
+                          </p>
+                          {membership ? (
+                            <div className="flex mt-1">
+                              <input
+                                type="number"
+                                value={number}
+                                onChange={(e) => setNumber(e.target.value)}
+                                className="h-[20px] w-[140px] border-2 border-gray-300"
+                                placeholder="Enter mobile number"
+                              />
+                              <button
+                                onClick={handleMemberShip}
+                                className="h-[20px] w-[100px] bg-slate-200 flex items-center justify-center"
+                              >
+                                Check{" "}
+                                {loading ? (
+                                  <RiLoader2Line className="h-3 w-3 animate-spin text-black " />
+                                ) : null}
+                              </button>
+                            </div>
+                          ) : null}
+                        </div>
+                      </div>
+                    ) : null}
                   </div>
                   {tableWiseCart?.length > 0 ? (
                     <div className="text-center space-x-4 my-4">

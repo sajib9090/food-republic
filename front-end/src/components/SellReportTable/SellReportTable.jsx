@@ -1,12 +1,13 @@
 /* eslint-disable react/prop-types */
 import CurrencyFormatter from "../CurrencyFormatter/CurrencyFormatter";
 
-const SellReportTable = ({ index, id, tableName, items }) => {
-  const totalSum = items?.reduce(
-    (sum, item) => sum + item?.item_quantity * item?.item_price_per_unit,
-    0
-  );
-
+const SellReportTable = ({
+  index,
+  id,
+  tableName,
+  totalDiscount,
+  totalBill,
+}) => {
   return (
     <div className="min-h-[50px] w-full border border-gray-200 rounded-sm shadow-md mb-1 flex items-center justify-between px-4">
       <div className="flex">
@@ -18,7 +19,7 @@ const SellReportTable = ({ index, id, tableName, items }) => {
       </div>
       <div>
         <p>
-          <CurrencyFormatter value={totalSum} />
+          <CurrencyFormatter value={totalBill - totalDiscount} />
         </p>
       </div>
     </div>
