@@ -87,6 +87,29 @@ async function run() {
         res.status(500).json({ error: "Internal Server Error" });
       }
     });
+    app.patch("/api/table/:id", async (req, res) => {
+      try {
+        const tableId = req.params.id;
+        const updatedData = req.body; // Assuming you send the updated data in the request body
+
+        // Validate or sanitize the updated data if needed
+
+        // Perform the update operation in the MongoDB collection
+        const result = await tableCollection.updateOne(
+          { _id: new ObjectId(tableId) },
+          { $set: updatedData }
+        );
+
+        if (result.modifiedCount === 1) {
+          res.json({ success: true, message: "Data updated successfully" });
+        } else {
+          res.status(404).json({ success: false, message: "Table not found" });
+        }
+      } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Internal Server Error" });
+      }
+    });
     // API endpoint to add a new table to the collection
     app.post("/api/add-table", async (req, res) => {
       try {
