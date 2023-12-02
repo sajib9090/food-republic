@@ -46,6 +46,8 @@ async function run() {
       .collection("void-invoices");
     const ExpensesCollection = client.db("FoodRepublic").collection("expenses");
 
+    const MemberCollection = client.db("FoodRepublic").collection("members");
+
     // API endpoint to get the list of tables from the collection
     //user
     app.get("/api/get-users", async (req, res) => {
@@ -466,7 +468,7 @@ async function run() {
     );
 
     app.post("/api/post-sold-invoices", async (req, res) => {
-      const { table_name, items } = req.body;
+      const { table_name, items, total_bill, total_discount } = req.body;
       const createdDate = new Date();
 
       try {
@@ -480,6 +482,8 @@ async function run() {
         const result = await SoldItemsCollection.insertOne({
           table_name,
           items: itemsWithTotalPrice,
+          total_bill,
+          total_discount,
           createdDate,
         });
 
@@ -612,8 +616,8 @@ async function run() {
     //expense api
     app.get("/api/get-expenses", async (req, res) => {
       try {
-        // Check if a date parameter is provided in the query
-        const { date, sortByTitle } = req.query;
+        // Check if date and month parameters are provided in the query
+        const { date, month, sortByTitle } = req.query;
 
         let query = {};
 
@@ -622,6 +626,17 @@ async function run() {
           query.createdDate = {
             $gte: new Date(`${date}T00:00:00.000Z`),
             $lt: new Date(`${date}T23:59:59.999Z`),
+          };
+        } else if (month) {
+          // If month parameter is provided, add it to the query
+          const startOfMonth = new Date(`${month}-01T00:00:00.000Z`);
+          const endOfMonth = new Date(
+            new Date(startOfMonth).setMonth(startOfMonth.getMonth() + 1) - 1
+          );
+
+          query.createdDate = {
+            $gte: startOfMonth,
+            $lt: endOfMonth,
           };
         }
 
@@ -633,7 +648,7 @@ async function run() {
             .sort({ title: 1 })
             .toArray();
         } else {
-          // If no date parameter is provided, retrieve all expenses
+          // If no date or month parameter is provided, retrieve all expenses
           expenses = await ExpensesCollection.find(query).toArray();
         }
 
@@ -697,6 +712,142 @@ async function run() {
       } catch (error) {
         console.error("Database Delete Error:", error);
         res.status(500).send("Error deleting expense from the database");
+      }
+    });
+
+    app.get("/api/get-members", async (req, res) => {
+      try {
+        const searchQuery = req.query.search;
+
+        if (searchQuery) {
+          // Find a member by mobile number or name
+          const member = await MemberCollection.findOne({
+            $or: [
+              { mobile: searchQuery },
+              { name: { $regex: new RegExp(searchQuery, "i") } }, // Case-insensitive search by name
+            ],
+          });
+
+          if (!member) {
+            return res.status(404).json({
+              message: "Member not found",
+            });
+          }
+
+          res.json({
+            message: "Member retrieved successfully",
+            member: member,
+          });
+        } else {
+          // Retrieve all member data from the collection
+          const allMembers = await MemberCollection.find().toArray();
+
+          res.json({
+            message: "Members retrieved successfully",
+            members: allMembers,
+          });
+        }
+      } catch (error) {
+        console.error("Database Retrieval Error:", error);
+        res.status(500).send("Error retrieving data from the database");
+      }
+    });
+
+    app.patch("/api/update-member/:mobile", async (req, res) => {
+      try {
+        const mobileNumber = req.params.mobile;
+        const updatedFields = req.body;
+
+        if (!mobileNumber) {
+          return res.status(400).json({
+            message: "Mobile number is required in the URL parameter",
+          });
+        }
+
+        // Find the member by mobile number
+        const member = await MemberCollection.findOne({ mobile: mobileNumber });
+
+        if (!member) {
+          return res.status(404).json({
+            message: "Member not found",
+          });
+        }
+
+        // Update member fields
+        const updatedMember = await MemberCollection.findOneAndUpdate(
+          { mobile: mobileNumber },
+          { $set: updatedFields },
+          { returnDocument: "after" }
+        );
+
+        res.json({
+          message: "Member updated successfully",
+          member: updatedMember.value,
+        });
+      } catch (error) {
+        console.error("Database Update Error:", error);
+        res.status(500).send("Error updating data in the database");
+      }
+    });
+
+    app.post("/api/add-member", async (req, res) => {
+      const { name, mobile } = req.body;
+      const discountValue = 15; // Set the default discount value to 15
+      const createdDate = new Date(); // Get the current date and time
+
+      try {
+        // Check if a member with the same mobile number already exists
+        const existingMember = await MemberCollection.findOne({ mobile });
+
+        if (existingMember) {
+          return res.status(400).json({
+            message: "A member with this mobile number already exists.",
+          });
+        }
+
+        // Insert member data into the collection
+        const result = await MemberCollection.insertOne({
+          name,
+          mobile,
+          discountValue,
+          createdDate,
+        });
+
+        res.json({
+          message: "Member added successfully",
+          insertedId: result.insertedId,
+        });
+      } catch (error) {
+        console.error("Database Insertion Error:", error);
+        res.status(500).send("Error inserting data into the database");
+      }
+    });
+    app.delete("/api/delete-member", async (req, res) => {
+      try {
+        const mobile = req.query.mobile;
+
+        if (!mobile) {
+          return res.status(400).json({
+            message: "Mobile number is required",
+          });
+        }
+
+        // Find and delete a member by mobile number
+        const result = await MemberCollection.deleteOne({ mobile: mobile });
+
+        if (result.deletedCount === 0) {
+          return res.status(404).json({
+            message: "Member not found",
+          });
+        }
+
+        res.json({
+          message: "Member deleted successfully",
+          deletedCount: result.deletedCount,
+        });
+      } catch (error) {
+        console.error("Database Deletion Error:", error);
+        res.status(500).send("Error deleting data from the database");
       }
     });
 
