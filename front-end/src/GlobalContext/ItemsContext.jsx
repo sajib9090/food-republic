@@ -6,10 +6,10 @@ const ItemsContext = createContext();
 // eslint-disable-next-line react/prop-types
 const ItemsProvider = ({ children }) => {
   const [productsKey, setProductsKey] = useState(0);
-  const [drinksAndJuices, setDrinkAndJuices] = useState([]);
-  const [fastFood, setFastFood] = useState([]);
-  const [vegetablesAndRices, setVegetablesAndRices] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [menuItems, setMenuItems] = useState([]);
   const [tables, setTables] = useState([]);
+  const [menuItemsLoading, setMenuItemsLoading] = useState(false);
 
   // ... other functions ...
 
@@ -18,32 +18,29 @@ const ItemsProvider = ({ children }) => {
     setProductsKey((prevKey) => prevKey + 1);
   };
 
-  const getDrinksAndJuicesItems = async (url) => {
+  const getCategories = async (url) => {
     axios
       .get(url)
       .then((res) => {
-        setDrinkAndJuices(res.data);
+        setCategories(res.data.categories);
       })
       .catch((err) => {
         console.log(err);
       });
   };
-  const getFastFoodItems = async (url) => {
-    try {
-      const res = await axios.get(url);
-      setFastFood(res.data);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  const getVegetablesAndRicesItems = async (url) => {
-    try {
-      const res = await axios.get(url);
-      setVegetablesAndRices(res.data);
-    } catch (err) {
-      console.error(err);
-    }
+  const getMenus = async (url) => {
+    setMenuItemsLoading(true);
+    axios
+      .get(url)
+      .then((res) => {
+        setMenuItems(res.data.menuItems);
+      })
+      .catch((err) => {
+        console.log(err);
+      })
+      .finally(() => {
+        setMenuItemsLoading(false);
+      });
   };
 
   const getTables = async (url) => {
@@ -57,13 +54,8 @@ const ItemsProvider = ({ children }) => {
 
   //all products
   useEffect(() => {
-    getDrinksAndJuicesItems(
-      `${import.meta.env.VITE_API_URL}/api/get-drinks-juices`
-    );
-    getFastFoodItems(`${import.meta.env.VITE_API_URL}/api/get-fast-food`);
-    getVegetablesAndRicesItems(
-      `${import.meta.env.VITE_API_URL}/api/get-vegetables-rices`
-    );
+    getMenus(`${import.meta.env.VITE_API_URL}/api/get-menu-items`);
+    getCategories(`${import.meta.env.VITE_API_URL}/api/get-categories`);
     getTables(`${import.meta.env.VITE_API_URL}/api/tables`);
   }, [productsKey]);
 
@@ -71,10 +63,10 @@ const ItemsProvider = ({ children }) => {
     <ItemsContext.Provider
       value={{
         refetchItems,
-        drinksAndJuices,
-        fastFood,
-        vegetablesAndRices,
+        categories,
+        menuItems,
         tables,
+        menuItemsLoading,
       }}
     >
       {children}

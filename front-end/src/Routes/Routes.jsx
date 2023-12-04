@@ -17,21 +17,8 @@ const Features = lazy(() => import("../Pages/Dashboard/Features/Features"));
 const MaintainTables = lazy(() =>
   import("../Pages/Dashboard/Features/MaintainTables/MaintainTables")
 );
-const MaintainFastFood = lazy(() =>
-  import("../Pages/Dashboard/Features/MaintainFastFood/MaintainFastFood")
-);
 const MaintainUsers = lazy(() =>
   import("../Pages/Dashboard/Features/MaintainUsers/MaintainUsers")
-);
-const MaintainDrinksAndJuices = lazy(() =>
-  import(
-    "../Pages/Dashboard/Features/MaintainDrinksAndJuices/MaintainDrinksAndJuices"
-  )
-);
-const MaintainVegetablesAndRices = lazy(() =>
-  import(
-    "../Pages/Dashboard/Features/MaintainVegetablesAndRices/MaintainVegetablesAndRices"
-  )
 );
 const SoldInvoice = lazy(() => import("../Pages/SoldInvoice/SoldInvoice"));
 const MaintainVoid = lazy(() =>
@@ -61,6 +48,9 @@ const ExpenseHistory = lazy(() =>
 );
 const MaintainMembers = lazy(() =>
   import("../Pages/Dashboard/Features/MaintainMembers/MaintainMembers")
+);
+const MaintainMenuItems = lazy(() =>
+  import("../Pages/Dashboard/Features/MaintainMenuItems/MaintainMenuItems")
 );
 
 export const router = createBrowserRouter([
@@ -185,30 +175,7 @@ export const router = createBrowserRouter([
                   </Suspense>
                 ),
               },
-              {
-                path: "maintain-fast-food",
-                element: (
-                  <Suspense fallback={<PrimaryLoader />}>
-                    <MaintainFastFood />
-                  </Suspense>
-                ),
-              },
-              {
-                path: "maintain-drinks-and-juices",
-                element: (
-                  <Suspense fallback={<PrimaryLoader />}>
-                    <MaintainDrinksAndJuices />
-                  </Suspense>
-                ),
-              },
-              {
-                path: "maintain-vegetables-and-Rice",
-                element: (
-                  <Suspense fallback={<PrimaryLoader />}>
-                    <MaintainVegetablesAndRices />
-                  </Suspense>
-                ),
-              },
+
               {
                 path: "maintain-users",
                 element: (
@@ -246,6 +213,14 @@ export const router = createBrowserRouter([
                 element: (
                   <Suspense fallback={<PrimaryLoader />}>
                     <MaintainMembers />
+                  </Suspense>
+                ),
+              },
+              {
+                path: "maintain-menu-items",
+                element: (
+                  <Suspense fallback={<PrimaryLoader />}>
+                    <MaintainMenuItems />
                   </Suspense>
                 ),
               },

@@ -3,49 +3,40 @@ import { NavLink, Outlet } from "react-router-dom";
 const Features = () => {
   const menu = [
     {
-      id: 1,
+      id: 0,
       title: "Maintain Tables",
       link: "maintain-tables",
     },
     {
+      id: 1,
+      title: "Maintain Menu Items",
+      link: "maintain-menu-items",
+    },
+    {
       id: 2,
-      title: "Maintain Fast Food",
-      link: "maintain-fast-food",
-    },
-    {
-      id: 3,
-      title: "Maintain Drinks & Juices",
-      link: "maintain-drinks-and-juices",
-    },
-    {
-      id: 4,
-      title: "Maintain Vegetables & Rice",
-      link: "maintain-vegetables-and-Rice",
-    },
-    {
-      id: 5,
-      title: "Maintain Users",
-      link: "maintain-users",
-    },
-    {
-      id: 6,
-      title: "Maintain Void",
-      link: "maintain-void",
-    },
-    {
-      id: 7,
       title: "Sell History",
       link: "sell-history",
     },
     {
-      id: 8,
+      id: 3,
       title: "Expense History",
       link: "expense-history",
     },
+
     {
-      id: 9,
+      id: 4,
+      title: "Maintain Void",
+      link: "maintain-void",
+    },
+    {
+      id: 5,
       title: "Maintain Members",
       link: "maintain-members",
+    },
+    {
+      id: 6,
+      title: "Maintain Users",
+      link: "maintain-users",
     },
   ];
 

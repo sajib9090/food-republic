@@ -24,7 +24,7 @@ const SelectOrders = () => {
   const [tableWiseCart, setTableWiseCart] = useState([]);
   const [memberShipDiscount, setMemberShipDiscount] = useState(null);
   const [availableDiscount, setAvailableDiscount] = useState(false);
-  const { drinksAndJuices, fastFood, vegetablesAndRices } = useItemsContext();
+  const { categories, menuItems } = useItemsContext();
   const { handleAddToBill, carts, itemRemove } = useCartContext();
   const componentRef = useRef();
   const navigate = useNavigate();
@@ -94,7 +94,9 @@ const SelectOrders = () => {
 
   const handleCart = (item, tableName) => {
     handleAddToBill(item, tableName);
-    toast.success(item.item_name + " " + "added");
+    toast.success(item.item_name + " added", {
+      autoClose: 500, // Set the timeout in milliseconds
+    });
   };
 
   //
@@ -167,105 +169,64 @@ const SelectOrders = () => {
       </h1>
 
       <div className="min-h-screen grid grid-cols-3 gap-2">
-        <div className="min-h-screen border border-gray-200 shadow-xl rounded-md">
-          <div>
-            <h1 className="text-center rounded-md py-2 bg-[#001529] bg-opacity-75 text-white font-bold text-xl">
-              Drinks & Juices
-            </h1>
-          </div>
-          {drinksAndJuices &&
-            drinksAndJuices?.items?.map((item, index) => (
+        {categories
+          ?.sort((a, b) => a?.category?.localeCompare(b.category))
+          .map((category, index) => (
+            <div
+              key={category._id}
+              className="min-h-screen border border-gray-200 shadow-xl rounded-md"
+            >
               <div
-                onClick={() => {
-                  handleCart(item, name);
-                }}
-                key={item?._id}
-                className="flex justify-between items-center shadow-md mt-4 pb-2 px-2 border-b border-gray-300 cursor-pointer"
+                className={`capitalize text-center rounded-md py-2 font-bold text-xl ${
+                  index === 0
+                    ? "bg-[#001529] bg-opacity-75 text-white"
+                    : index === 1
+                    ? "bg-[#aa5f34] bg-opacity-75 text-white"
+                    : "bg-[#457322] bg-opacity-75 text-white"
+                }`}
               >
-                <div className="flex font-bold text-black text-lg">
-                  <div>
-                    <p className="mr-1">{index + 1}.</p>
-                  </div>
-                  <div>
-                    <p className="wrapped-text">
-                      <HyphenToSpaceConverter inputString={item?.item_name} />
-                    </p>
-                  </div>
-                </div>
-                <div>
-                  <button className="bg-[#001529] hover:bg-opacity-70 px-2 py-1 text-white rounded-md">
-                    <CurrencyFormatter value={item?.item_price} />
-                  </button>
-                </div>
+                <HyphenToSpaceConverter inputString={category.category} />
               </div>
-            ))}
-        </div>
-        <div className="min-h-screen border border-gray-200 shadow-xl rounded-md">
-          <div>
-            <h1 className="text-center rounded-md py-2 bg-[#aa5f34] bg-opacity-75 text-white font-bold text-xl">
-              Fast Food
-            </h1>
-          </div>
-          {fastFood &&
-            fastFood?.items?.map((item, index) => (
-              <div
-                onClick={() => {
-                  handleCart(item, name);
-                }}
-                key={item._id}
-                className="flex justify-between items-center mt-4 pb-2 shadow-md px-2 border-b border-gray-300 cursor-pointer"
-              >
-                <div className="flex font-bold text-black text-lg">
-                  <div>
-                    <p className="mr-1">{index + 1}.</p>
+
+              {menuItems
+                ?.filter((item) => item?.category === category.category)
+                .map((item, i) => (
+                  <div
+                    key={item._id}
+                    onClick={() => {
+                      handleCart(item, name);
+                    }}
+                    className="flex justify-between items-center shadow-md mt-4 pb-2 px-2 border-b border-gray-300 cursor-pointer"
+                  >
+                    <div className="flex font-bold text-black text-lg">
+                      <div>
+                        <p className="mr-1">{i + 1}.</p>
+                      </div>
+                      <div>
+                        <p className="wrapped-text">
+                          <HyphenToSpaceConverter
+                            inputString={item?.item_name}
+                          />
+                        </p>
+                      </div>
+                    </div>
+                    <div>
+                      <button
+                        className={`hover:bg-opacity-70 px-2 py-1 text-white rounded-md ${
+                          index == 0
+                            ? "bg-[#001529]"
+                            : index == 1
+                            ? "bg-[#aa5f34]"
+                            : "bg-[#457322]"
+                        }`}
+                      >
+                        <CurrencyFormatter value={item?.item_price} />
+                      </button>
+                    </div>
                   </div>
-                  <div>
-                    <p className="capitalize wrapped-text">
-                      <HyphenToSpaceConverter inputString={item?.item_name} />
-                    </p>
-                  </div>
-                </div>
-                <div>
-                  <button className="bg-[#714226] hover:bg-opacity-70 px-2 py-1 text-white rounded-md">
-                    <CurrencyFormatter value={item?.item_price} />
-                  </button>
-                </div>
-              </div>
-            ))}
-        </div>
-        <div className="min-h-screen border border-gray-200 shadow-xl rounded-md">
-          <div>
-            <h1 className="text-center rounded-md py-2 bg-[#457322] bg-opacity-75 text-white font-bold text-xl">
-              Vegetables & Rice
-            </h1>
-          </div>
-          {vegetablesAndRices &&
-            vegetablesAndRices?.items?.map((item, index) => (
-              <div
-                onClick={() => {
-                  handleCart(item, name);
-                }}
-                key={item._id}
-                className="flex justify-between items-center mt-4 pb-2 shadow-md px-2 border-b border-gray-300 cursor-pointer"
-              >
-                <div className="flex font-bold text-black text-lg">
-                  <div>
-                    <p className="mr-1">{index + 1}.</p>
-                  </div>
-                  <div>
-                    <p className="capitalize wrapped-text">
-                      <HyphenToSpaceConverter inputString={item.item_name} />
-                    </p>
-                  </div>
-                </div>
-                <div>
-                  <button className="bg-[#416622] hover:bg-opacity-70 px-2 py-1 text-white rounded-md">
-                    <CurrencyFormatter value={item.item_price} />
-                  </button>
-                </div>
-              </div>
-            ))}
-        </div>
+                ))}
+            </div>
+          ))}
       </div>
       {/* modal */}
       <Transition appear show={isOpen} as={Fragment}>
@@ -563,3 +524,105 @@ const SelectOrders = () => {
 };
 
 export default SelectOrders;
+
+{
+  /* <div className="min-h-screen border border-gray-200 shadow-xl rounded-md">
+          <div>
+            <h1 className="text-center rounded-md py-2 bg-[#001529] bg-opacity-75 text-white font-bold text-xl">
+              Drinks & Juices
+            </h1>
+          </div>
+          {drinksAndJuices &&
+            drinksAndJuices?.items?.map((item, index) => (
+              <div
+                onClick={() => {
+                  handleCart(item, name);
+                }}
+                key={item?._id}
+                className="flex justify-between items-center shadow-md mt-4 pb-2 px-2 border-b border-gray-300 cursor-pointer"
+              >
+                <div className="flex font-bold text-black text-lg">
+                  <div>
+                    <p className="mr-1">{index + 1}.</p>
+                  </div>
+                  <div>
+                    <p className="wrapped-text">
+                      <HyphenToSpaceConverter inputString={item?.item_name} />
+                    </p>
+                  </div>
+                </div>
+                <div>
+                  <button className="bg-[#001529] hover:bg-opacity-70 px-2 py-1 text-white rounded-md">
+                    <CurrencyFormatter value={item?.item_price} />
+                  </button>
+                </div>
+              </div>
+            ))}
+        </div>
+        <div className="min-h-screen border border-gray-200 shadow-xl rounded-md">
+          <div>
+            <h1 className="text-center rounded-md py-2 bg-[#aa5f34] bg-opacity-75 text-white font-bold text-xl">
+              Fast Food
+            </h1>
+          </div>
+          {fastFood &&
+            fastFood?.items?.map((item, index) => (
+              <div
+                onClick={() => {
+                  handleCart(item, name);
+                }}
+                key={item._id}
+                className="flex justify-between items-center mt-4 pb-2 shadow-md px-2 border-b border-gray-300 cursor-pointer"
+              >
+                <div className="flex font-bold text-black text-lg">
+                  <div>
+                    <p className="mr-1">{index + 1}.</p>
+                  </div>
+                  <div>
+                    <p className="capitalize wrapped-text">
+                      <HyphenToSpaceConverter inputString={item?.item_name} />
+                    </p>
+                  </div>
+                </div>
+                <div>
+                  <button className="bg-[#714226] hover:bg-opacity-70 px-2 py-1 text-white rounded-md">
+                    <CurrencyFormatter value={item?.item_price} />
+                  </button>
+                </div>
+              </div>
+            ))}
+        </div>
+        <div className="min-h-screen border border-gray-200 shadow-xl rounded-md">
+          <div>
+            <h1 className="text-center rounded-md py-2 bg-[#457322] bg-opacity-75 text-white font-bold text-xl">
+              Vegetables & Rice
+            </h1>
+          </div>
+          {vegetablesAndRices &&
+            vegetablesAndRices?.items?.map((item, index) => (
+              <div
+                onClick={() => {
+                  handleCart(item, name);
+                }}
+                key={item._id}
+                className="flex justify-between items-center mt-4 pb-2 shadow-md px-2 border-b border-gray-300 cursor-pointer"
+              >
+                <div className="flex font-bold text-black text-lg">
+                  <div>
+                    <p className="mr-1">{index + 1}.</p>
+                  </div>
+                  <div>
+                    <p className="capitalize wrapped-text">
+                      <HyphenToSpaceConverter inputString={item.item_name} />
+                    </p>
+                  </div>
+                </div>
+                <div>
+                  <button className="bg-[#416622] hover:bg-opacity-70 px-2 py-1 text-white rounded-md">
+                    <CurrencyFormatter value={item.item_price} />
+                  </button>
+                </div>
+              </div>
+            ))}
+        </div> */
+}
