@@ -106,19 +106,19 @@ const SellHistory = () => {
               {allItemNames ? (
                 <>
                   {allItemNames?.length > 0 && (
-                    <table className="mt-4 border-collapse border border-gray-800">
+                    <table className="mt-4 border-collapse border border-gray-300">
                       <thead>
                         <tr>
-                          <th className="border border-gray-800 p-2"></th>
+                          <th className="border border-gray-300 p-2"></th>
                           {[...Array(totalDaysInMonth).keys()].map((day) => (
                             <th
                               key={day + 1}
-                              className="border border-gray-800 p-2 text-center bg-blue-50"
+                              className="border border-gray-300 p-2 text-center font-bold bg-blue-100"
                             >
                               {day + 1}
                             </th>
                           ))}
-                          <th className="border border-gray-800 p-2 text-center bg-blue-50">
+                          <th className="border border-gray-300 p-2 text-center bg-blue-200">
                             Total
                           </th>
                         </tr>
@@ -127,21 +127,21 @@ const SellHistory = () => {
                         {sellData &&
                           sellData?.map((sellDataRow, index) => (
                             <tr key={sellDataRow.itemName}>
-                              <td className="border border-gray-800 p-2 bg-purple-100">
-                                <span className="mr-2">{index + 1}.</span>
+                              <td className="border border-gray-300 p-2 bg-green-200 font-bold">
+                                <span className="mr-1">{index + 1}.</span>
                                 {sellDataRow.itemName}
                               </td>
                               {sellDataRow?.sellQuantities?.map(
                                 (sellQuantity, index) => (
                                   <td
                                     key={index + 1}
-                                    className="border border-gray-800 p-3"
+                                    className="border border-gray-300 p-3 bg-slate-100"
                                   >
-                                    {sellQuantity}
+                                    {sellQuantity == 0 ? "-" : sellQuantity}
                                   </td>
                                 )
                               )}
-                              <td className="border border-gray-800 p-2 font-bold">
+                              <td className="border border-gray-300 p-2 font-bold bg-purple-300">
                                 {sellDataRow.sellQuantities.reduce(
                                   (sum, qty) => sum + qty,
                                   0
@@ -152,14 +152,14 @@ const SellHistory = () => {
 
                         {/* Add a row for the totals */}
                         <tr>
-                          <td className="border border-gray-800 p-2 font-bold">
-                            Total
+                          <td className="border border-gray-300 p-2 font-bold bg-blue-200">
+                            Daily Sell Quantity
                           </td>
                           {sellData &&
                             sellData[0]?.sellQuantities?.map((_, index) => (
                               <td
                                 key={index + 1}
-                                className="border border-gray-800 p-3 font-bold"
+                                className="border border-gray-300 p-3 font-bold bg-blue-200"
                               >
                                 {sellData.reduce(
                                   (sum, sellDataRow) =>
@@ -168,7 +168,7 @@ const SellHistory = () => {
                                 )}
                               </td>
                             ))}
-                          <td className="border border-gray-800 p-2 font-bold">
+                          <td className="border border-gray-300 p-2 font-bold bg-blue-300">
                             {sellData.reduce(
                               (sum, sellDataRow) =>
                                 sum +
