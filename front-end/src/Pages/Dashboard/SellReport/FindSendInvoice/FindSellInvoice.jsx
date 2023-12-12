@@ -8,13 +8,12 @@ import ReactToPrint from "react-to-print";
 
 const FindSellInvoice = () => {
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(false);
   const [soldInvoice, setSoldInvoice] = useState({});
+  // console.log(Object.keys(soldInvoice).length);
   const componentRef = useRef();
 
   const handleSearch = (e) => {
     setLoading(true);
-    setError(false);
     e.preventDefault();
     const id = e.target.id.value;
     axios
@@ -23,13 +22,11 @@ const FindSellInvoice = () => {
         if (res) {
           setSoldInvoice(res.data.soldInvoice);
           setLoading(false);
-          setError(false);
         }
       })
       .catch((err) => {
         if (err) {
           setLoading(false);
-          setError(true);
         }
       });
   };
@@ -65,18 +62,18 @@ const FindSellInvoice = () => {
       </div>
       {/* invoice */}
 
-      {!error ? (
+      {Object.keys(soldInvoice)?.length > 0 ? (
         <div className="mt-12">
           <div
             ref={componentRef}
             className="max-w-[310px] min-h-[300px] shadow-md mx-auto rounded-md"
           >
-            <div className="text-center mt-2 border-b border-gray-500">
+            <div className="text-center mt-2 border-b border-gray-800">
               <h1 className="text-2xl font-bold">Food Republic</h1>
-              <address className="text-xs mt-1">
+              <p className="text-[9px] mt-1">
                 Majhi Plaza 2nd floor, Naria, Shariatpur
-              </address>
-              <p className="text-[10px] text-gray-600 mt-2">
+              </p>
+              <p className="text-[10px] text-black mt-2">
                 Invoice: <span className="ml-1">{soldInvoice?._id}</span>
               </p>
               <p className="text-xs mb-1">
@@ -85,11 +82,18 @@ const FindSellInvoice = () => {
               <p className="capitalize text-xs">{soldInvoice?.table_name}</p>
             </div>
             <div className="mt-2 px-1">
+              <div className="min-h-[30px] text-xs flex justify-between items-center border-b border-gray-600">
+                <div>Items</div>
+                <div className="flex mr-1">
+                  <p className="mr-6">Quantity</p>
+                  <p>Price</p>
+                </div>
+              </div>
               {soldInvoice &&
                 soldInvoice?.items?.map((item, index) => (
                   <div
                     key={item._id}
-                    className="min-h-[50px] w-full border-b border-gray-300 flex items-center justify-between text-xs"
+                    className="min-h-[30px] w-full border-b border-gray-600 flex items-center justify-between text-xs"
                   >
                     <div className="flex items-center">
                       <p className="mr-1">{index + 1}.</p>

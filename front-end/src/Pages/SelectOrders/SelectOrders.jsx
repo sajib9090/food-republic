@@ -461,7 +461,7 @@ const SelectOrders = () => {
                             <div
                               onClick={() => handleCross(item)}
                               key={item._id}
-                              className="min-h-[50px] w-full border-b border-gray-300 flex items-center cursor-pointer"
+                              className="min-h-[30px] w-full border-b border-gray-500 flex items-center cursor-pointer"
                             >
                               <p className="text-xs">{index + 1}.</p>
                               {item.showDeleteTag ? (
@@ -478,11 +478,11 @@ const SelectOrders = () => {
                                 </p>
                               )}
                               <div className="ml-auto mr-2">
-                                <button className="px-2 text-gray-500 text-xs">
+                                <button className="px-2 text-black text-xs">
                                   {item.item_quantity} piece
                                 </button>
                               </div>
-                              <div className="text-xs text-gray-500">
+                              <div className="text-xs text-black">
                                 <CurrencyFormatter
                                   value={
                                     item.item_price_per_unit *
