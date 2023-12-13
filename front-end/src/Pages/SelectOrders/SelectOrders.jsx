@@ -445,13 +445,22 @@ const SelectOrders = () => {
                     <h1 className="text-center font-bold text-xl">
                       Food Republic
                     </h1>
-                    <h1 className="text-center font-semibold text-base mb-4 capitalize">
+                    <h1 className="text-center font-semibold text-base mb-1 capitalize">
                       {name}
                     </h1>
-                    <p className="text-center text-[10px]">
+
+                    <div className="text-center text-[10px]">
                       <DateFormatter dateString={new Date()} />
-                    </p>
+                    </div>
+                    <h1 className="text-center font-bold">Kitchen Copy</h1>
                     <div>
+                      <div className="min-h-[30px] border-b border-black flex items-center justify-between text-xs mt-2">
+                        <div>Items</div>
+                        <div className="flex items-center">
+                          <p>Quantity</p>
+                          <p className="mr-1 ml-8">Price</p>
+                        </div>
+                      </div>
                       <div>
                         {tableWiseCart
                           ?.sort((a, b) =>
