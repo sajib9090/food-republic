@@ -46,22 +46,22 @@ const SoldInvoice = () => {
     <div>
       <div
         ref={componentRef}
-        className="max-w-[310px] min-h-[300px] shadow-md mx-auto rounded-md pb-2"
+        className="max-w-[310px] min-h-[300px] shadow-md mx-auto rounded-md pb-1"
       >
-        <div className="text-center mt-6 border-b border-gray-500 relative">
-          {/* <div className="absolute">
+        <div className="text-center mt-6 relative">
+          <div className="absolute left-1">
             <img
-              src="https://i.ibb.co/SywmmpK/food-republic.png"
+              src="https://i.ibb.co/CvZ6N5H/food-republic-bw-logo.png"
               alt=""
               className="h-[50px]"
             />
-          </div> */}
+          </div>
           <h1 className="text-2xl font-bold">Food Republic</h1>
-          <p className="text-[9px] mt-1">
+          <p className="text-[9px] -mt-0.5">
             Majhi Plaza 2nd floor, Naria, Shariatpur
           </p>
           <p className="text-[10px] text-black mt-2">
-            Invoice: <span className="ml-1">{soldInvoice?._id}</span>
+            InvoiceID: <span className="ml-1">{soldInvoice?._id}</span>
           </p>
           <p className="text-xs mb-1">
             <DateFormatter dateString={soldInvoice?.createdDate} />
@@ -69,7 +69,7 @@ const SoldInvoice = () => {
           <p className="capitalize text-xs">{soldInvoice?.table_name}</p>
         </div>
         <div className="mt-2 px-1">
-          <div className="min-h-[30px] border-b border-gray-500 flex justify-between items-center px-3 text-xs">
+          <div className="min-h-[30px] border-b border-black flex justify-between items-center px-3 text-xs">
             <div>Items</div>
             <div className="flex">
               <div className="mr-9">Quantity</div>
@@ -126,8 +126,8 @@ const SoldInvoice = () => {
             </div>
           </>
         ) : null}
-        <div className="text-[8px] text-center mt-2">
-          Software Developed by Sajib Hossain
+        <div className="text-[7px] text-center mt-2 font-medium">
+          Software Developed by Saif Sajib
         </div>
       </div>
       <div className="max-w-[310px] mx-auto text-right">
