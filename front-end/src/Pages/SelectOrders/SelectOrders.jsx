@@ -458,7 +458,7 @@ const SelectOrders = () => {
                         <div>Items</div>
                         <div className="flex items-center">
                           <p>Quantity</p>
-                          <p className="mr-1 ml-8">Price</p>
+                          <p className="mr-1 ml-6">Price</p>
                         </div>
                       </div>
                       <div>
@@ -470,39 +470,44 @@ const SelectOrders = () => {
                             <div
                               onClick={() => handleCross(item)}
                               key={item._id}
-                              className="min-h-[30px] w-full border-b border-gray-500 flex items-center cursor-pointer"
+                              className="min-h-[30px] w-full border-b border-gray-500 flex items-center cursor-pointer justify-between text-[10px]"
                             >
-                              <p className="text-xs">{index + 1}.</p>
-                              {item.showDeleteTag ? (
-                                <del className="text-xs wrapped-text">
-                                  <HyphenToSpaceConverter
-                                    inputString={item.item_name}
-                                  />
-                                </del>
-                              ) : (
-                                <p className="text-xs wrapped-text">
-                                  <HyphenToSpaceConverter
-                                    inputString={item.item_name}
-                                  />
-                                </p>
-                              )}
-                              <div className="ml-auto mr-2">
-                                <button className="px-2 text-black text-xs">
-                                  {item.item_quantity} piece
-                                </button>
+                              <div className="flex items-center min-w-[70%]">
+                                <p className="">{index + 1}.</p>
+                                {item.showDeleteTag ? (
+                                  <del className=" wrapped-text">
+                                    <HyphenToSpaceConverter
+                                      inputString={item.item_name}
+                                    />
+                                  </del>
+                                ) : (
+                                  <p className="wrapped-text">
+                                    <HyphenToSpaceConverter
+                                      inputString={item.item_name}
+                                    />
+                                  </p>
+                                )}
                               </div>
-                              <div className="text-xs text-black">
-                                <CurrencyFormatter
-                                  value={
-                                    item.item_price_per_unit *
-                                    item.item_quantity
-                                  }
-                                />
+                              <div className="flex items-center min-w-[30%]">
+                                <div className="ml-auto flex min-w-[30%]">
+                                  <button className=" text-black">
+                                    {item.item_quantity}
+                                  </button>
+                                  <button className="ml-2 text-black">-</button>
+                                </div>
+                                <div className="text-black min-w-[70%] flex justify-end">
+                                  <CurrencyFormatter
+                                    value={
+                                      item.item_price_per_unit *
+                                      item.item_quantity
+                                    }
+                                  />
+                                </div>
                               </div>
                             </div>
                           ))}
                       </div>
-                      <div className="text-lg font-semibold mt-1">
+                      <div className="text-base font-semibold mt-1">
                         <h1 className="flex justify-end">
                           Total Price:{" "}
                           <span className="ml-2">
