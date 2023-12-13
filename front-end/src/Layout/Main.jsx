@@ -106,7 +106,7 @@ const Main = () => {
               key={"/dashboard"}
               icon={<MdDashboard className="h-4 w-4" />}
             >
-              <Link to={"/dashboard"}>Dashboard</Link>
+              <Link to={"/dashboard"}>Admin</Link>
             </Menu.Item>
             <Menu.Item
               onClick={() => setIsOpen(!isOpen)}

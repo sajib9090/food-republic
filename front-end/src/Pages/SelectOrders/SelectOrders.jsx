@@ -258,7 +258,7 @@ const SelectOrders = () => {
                 leaveFrom="opacity-100 scale-100"
                 leaveTo="opacity-0 scale-95"
               >
-                <Dialog.Panel className="w-full max-w-xl transform overflow-hidden rounded-md bg-white text-left align-middle shadow-xl transition-all relative">
+                <Dialog.Panel className="w-full max-w-3xl transform overflow-hidden rounded-md bg-white text-left align-middle shadow-xl transition-all relative">
                   <div className="absolute right-0">
                     <MdCancel
                       onClick={() => setIsOpen(!isOpen)}
@@ -274,44 +274,61 @@ const SelectOrders = () => {
                     </h1>
                     <div>
                       {tableWiseCart?.length > 0 ? (
-                        <div>
-                          {tableWiseCart
-                            ?.sort((a, b) =>
-                              a.item_name.localeCompare(b.item_name)
-                            )
-                            .map((item, index) => (
-                              <div
-                                key={item._id}
-                                className="min-h-[50px] w-full border-b border-gray-300 shadow-md flex items-center py-2"
-                              >
-                                <p>{index + 1}.</p>
-                                <div className="wrapped-text">
-                                  <HyphenToSpaceConverter
-                                    inputString={item.item_name}
-                                  />
+                        <>
+                          <div className="min-h-[30px] border-b border-gray-200 flex items-center justify-between mb-2 font-bold">
+                            <div>
+                              <p className="ml-4">Items</p>
+                            </div>
+                            <div className="flex items-center mr-16">
+                              <p className="mr-[5.4rem]">Quantity</p>
+                              <p>Price</p>
+                            </div>
+                          </div>
+                          <div>
+                            {tableWiseCart
+                              ?.sort((a, b) =>
+                                a.item_name.localeCompare(b.item_name)
+                              )
+                              .map((item, index) => (
+                                <div
+                                  key={item._id}
+                                  className="min-h-[50px] w-full border-b border-gray-300 shadow-md flex items-center justify-between py-2"
+                                >
+                                  <div className="flex items-center min-w-[65%]">
+                                    <p>{index + 1}.</p>
+                                    <div className="wrapped-text2">
+                                      <HyphenToSpaceConverter
+                                        inputString={item.item_name}
+                                      />
+                                    </div>
+                                  </div>
+                                  <div className="flex items-center min-w-[35%]">
+                                    <div className="min-w-[20%] flex justify-end">
+                                      <p className="px-2 text-gray-500 flex">
+                                        {item.item_quantity}
+                                      </p>
+                                    </div>
+                                    <div className="min-w-[60%] flex justify-end">
+                                      <CurrencyFormatter
+                                        value={
+                                          item.item_price_per_unit *
+                                          item.item_quantity
+                                        }
+                                      />
+                                    </div>
+                                    <div className="min-w-[20%] flex justify-end">
+                                      <MdDelete
+                                        onClick={() =>
+                                          handleSingleItemRemove(item)
+                                        }
+                                        className="text-red-700 h-8 w-8 cursor-pointer mx-2"
+                                      />
+                                    </div>
+                                  </div>
                                 </div>
-                                <div className="ml-auto mr-4">
-                                  <button className="px-2 text-gray-500">
-                                    {item.item_quantity} piece
-                                  </button>
-                                </div>
-                                <div className="px-4">
-                                  <CurrencyFormatter
-                                    value={
-                                      item.item_price_per_unit *
-                                      item.item_quantity
-                                    }
-                                  />
-                                </div>
-                                <div className="">
-                                  <MdDelete
-                                    onClick={() => handleSingleItemRemove(item)}
-                                    className="text-red-700 h-6 w-6 cursor-pointer mx-4"
-                                  />
-                                </div>
-                              </div>
-                            ))}
-                        </div>
+                              ))}
+                          </div>
+                        </>
                       ) : (
                         <div>
                           <h1 className="text-center mt-6">Empty...</h1>
