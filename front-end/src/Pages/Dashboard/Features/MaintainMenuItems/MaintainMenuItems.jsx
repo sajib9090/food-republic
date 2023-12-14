@@ -268,7 +268,7 @@ const MaintainMenuItems = () => {
                             <p className="mr-1">{i + 1}.</p>
                           </div>
                           <div>
-                            <p className="wrapped-text">
+                            <p className="wrapped-text capitalize">
                               <HyphenToSpaceConverter
                                 inputString={item?.item_name}
                               />

@@ -29,7 +29,7 @@ export const UserContextProvider = ({ children }) => {
   useEffect(() => {
     fetchUsers(`${import.meta.env.VITE_API_URL}/api/get-users`);
     fetchSingleUser(allUser, user);
-  }, [user]);
+  }, [user, allUser]);
 
   //return value
   return (

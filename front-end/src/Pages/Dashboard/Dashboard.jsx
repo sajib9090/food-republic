@@ -3,11 +3,12 @@ import { useUserContext } from "../../GlobalContext/UserContext";
 
 const Dashboard = () => {
   const { singleUser } = useUserContext();
+  // console.log(singleUser);
 
   return (
     <div>
       {singleUser ? (
-        singleUser?.role == "admin" ? (
+        singleUser?.role == "admin" || singleUser?.role == "chairman" ? (
           <div className="h-[40px] w-full flex items-center justify-center space-x-4 border-b border-gray-200">
             <NavLink
               to={"inventory"}

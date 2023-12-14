@@ -120,7 +120,8 @@ const MaintainUsers = () => {
                           Choose a role
                         </option>
                         <option value="admin">Admin</option>
-                        <option value="cashier">Cashier</option>
+                        <option value="chairman">Chairman</option>
+                        <option value="manager">Manager</option>
                       </select>
                       {errors.role && (
                         <p className="text-red-700" role="alert">

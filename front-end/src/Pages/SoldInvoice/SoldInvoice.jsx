@@ -62,8 +62,8 @@ const SoldInvoice = () => {
             Mazhi Plaza 2nd floor, Naria, Shariatpur
           </p>
           <div className="text-[8.5px] flex justify-center space-x-1">
-            <p>01770 940333,</p>
-            <p>01903 390050</p>
+            <p>+8801770 940333,</p>
+            <p>+8801903 390050</p>
           </div>
           <p className="text-[8px] text-black mt-2">
             InvoiceID: <span className="ml-1">{soldInvoice?._id}</span>
@@ -89,7 +89,7 @@ const SoldInvoice = () => {
               >
                 <div className="flex items-center w-[70%]">
                   <p className="mr-1">{index + 1}.</p>
-                  <p className="wrapped-text3">
+                  <p className="wrapped-text3 capitalize">
                     <HyphenToSpaceConverter inputString={item?.item_name} />
                   </p>
                 </div>

@@ -203,7 +203,7 @@ const SelectOrders = () => {
                         <p className="mr-1">{i + 1}.</p>
                       </div>
                       <div>
-                        <p className="wrapped-text">
+                        <p className="wrapped-text capitalize">
                           <HyphenToSpaceConverter
                             inputString={item?.item_name}
                           />
@@ -296,7 +296,7 @@ const SelectOrders = () => {
                                 >
                                   <div className="flex items-center min-w-[65%]">
                                     <p>{index + 1}.</p>
-                                    <div className="wrapped-text2">
+                                    <div className="wrapped-text2 capitalize">
                                       <HyphenToSpaceConverter
                                         inputString={item.item_name}
                                       />
@@ -492,13 +492,13 @@ const SelectOrders = () => {
                               <div className="flex items-center min-w-[70%]">
                                 <p className="">{index + 1}.</p>
                                 {item.showDeleteTag ? (
-                                  <del className=" wrapped-text">
+                                  <del className=" wrapped-text capitalize">
                                     <HyphenToSpaceConverter
                                       inputString={item.item_name}
                                     />
                                   </del>
                                 ) : (
-                                  <p className="wrapped-text">
+                                  <p className="wrapped-text capitalize">
                                     <HyphenToSpaceConverter
                                       inputString={item.item_name}
                                     />
