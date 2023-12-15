@@ -12,7 +12,6 @@ const ItemsProvider = ({ children }) => {
   const [menuItemsLoading, setMenuItemsLoading] = useState(false);
 
   // ... other functions ...
-
   // Function to refetch products data
   const refetchItems = () => {
     setProductsKey((prevKey) => prevKey + 1);

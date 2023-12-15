@@ -1,14 +1,24 @@
 import { Disclosure } from "@headlessui/react";
 import { ChevronUpIcon } from "@heroicons/react/20/solid";
-import { useContext, useState } from "react";
+import { Fragment, useContext, useState } from "react";
 import { useForm } from "react-hook-form";
 import { FaEyeSlash, FaEye } from "react-icons/fa";
 import { AuthContext } from "../../../../GlobalContext/AuthProvider";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { useUserContext } from "../../../../GlobalContext/UserContext";
+import DateFormatter from "../../../../components/DateFormatter/DateFormatter";
+import { Dialog, Transition } from "@headlessui/react";
+import toast from "react-hot-toast";
+import { RiLoader2Fill } from "react-icons/ri";
 
 const MaintainUsers = () => {
   const [visible, setVisible] = useState(false);
+  let [isOpen, setIsOpen] = useState(false);
+  const [editedUser, setEditedUser] = useState({});
+  const [editLoading, setEditLoading] = useState(false);
+  const { allUser, singleUser, refetchUsers } = useUserContext();
+
   const navigate = useNavigate();
   const { setLoading, createNewUserWithEmail, logOut } =
     useContext(AuthContext);
@@ -21,11 +31,10 @@ const MaintainUsers = () => {
 
   const onSubmit = (data) => {
     if (data && data.email) {
-      // Update the 'username' field by appending '@foodrepublic.com'
       data.email = data.email + "@foodrepublic.com";
 
       const user = {
-        email: data.email,
+        email: data.email.toLowerCase(),
         role: data.role,
         createdDate: new Date().toISOString(),
       };
@@ -73,10 +82,39 @@ const MaintainUsers = () => {
     }
   };
 
+  const handleChangeRole = (e) => {
+    e.preventDefault();
+    const userRole = e.target.role.value;
+    const data = {
+      role: userRole,
+    };
+    if (userRole) {
+      setEditLoading(true);
+      axios
+        .patch(
+          `${import.meta.env.VITE_API_URL}/api/update-user/${editedUser?._id}`,
+          data
+        )
+        .then((res) => {
+          if (res) {
+            refetchUsers();
+            setIsOpen(!isOpen);
+            setEditLoading(false);
+          }
+        })
+        .catch((err) => {
+          if (err) {
+            toast.error("Something went wrong");
+            setEditLoading(false);
+          }
+        });
+    }
+  };
+
   return (
     <div>
       <div className="w-full px-4 pt-4">
-        <div className="mx-auto w-full max-w-md shadow-md rounded-2xl bg-white p-2">
+        <div className="mx-auto w-full max-w-md shadow-md rounded-2xl bg-white p-2 mb-8">
           <Disclosure>
             {({ open }) => (
               <>
@@ -165,7 +203,111 @@ const MaintainUsers = () => {
             )}
           </Disclosure>
         </div>
+        <div>
+          {allUser &&
+            allUser
+              .filter((user) => user.email !== "rayan@foodrepublic.com")
+              .map((user, index) => (
+                <div
+                  key={user._id}
+                  className="max-w-3xl mx-auto min-h-[60px] border-b border-gray-300 flex justify-between items-center px-2"
+                >
+                  <div className="flex items-center">
+                    <div className="mr-2">{index + 1}.</div>
+                    <div className="flex items-center">
+                      <p>Username:</p>
+                      <p className="ml-2">{user.email.split("@")[0]}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-end space-x-8">
+                    <div className="flex items-center">
+                      <p>Role:</p>
+                      <p className="ml-2">{user.role}</p>
+                    </div>
+                    <div className="flex items-center space-x-12">
+                      <DateFormatter dateString={user.createdDate} />
+                      <button
+                        onClick={() => {
+                          setEditedUser(user);
+                          setIsOpen(!isOpen);
+                        }}
+                        disabled={singleUser?.email == user.email}
+                        className="bg-blue-600 px-2 py-1 text-white rounded hover:bg-opacity-70"
+                      >
+                        Change Role
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+        </div>
       </div>
+
+      <Transition appear show={isOpen} as={Fragment}>
+        <Dialog
+          as="div"
+          className="relative z-10"
+          onClose={() => setIsOpen(!isOpen)}
+        >
+          <Transition.Child
+            as={Fragment}
+            enter="ease-out duration-300"
+            enterFrom="opacity-0"
+            enterTo="opacity-100"
+            leave="ease-in duration-200"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
+          >
+            <div className="fixed inset-0 bg-black/25" />
+          </Transition.Child>
+
+          <div className="fixed inset-0 overflow-y-auto">
+            <div className="flex min-h-full items-center justify-center p-4 text-center">
+              <Transition.Child
+                as={Fragment}
+                enter="ease-out duration-300"
+                enterFrom="opacity-0 scale-95"
+                enterTo="opacity-100 scale-100"
+                leave="ease-in duration-200"
+                leaveFrom="opacity-100 scale-100"
+                leaveTo="opacity-0 scale-95"
+              >
+                <Dialog.Panel className="w-full max-w-[200px] transform overflow-hidden rounded bg-white p-4 text-left align-middle shadow-xl transition-all">
+                  <form onSubmit={handleChangeRole}>
+                    <div>
+                      <label>Select role*</label>
+                      <select
+                        required
+                        name="role"
+                        className="h-[40px] w-full border-2 border-purple-900 rounded-md"
+                      >
+                        <option value="" disabled selected>
+                          Choose a role
+                        </option>
+                        <option value="admin">Admin</option>
+                        <option value="chairman">Chairman</option>
+                        <option value="manager">Manager</option>
+                      </select>
+                    </div>
+                    <div className="mt-2">
+                      <button
+                        type="submit"
+                        disabled={editLoading}
+                        className="h-[40px] w-full border-2 border-purple-900 bg-purple-900 text-white rounded-md flex items-center justify-center"
+                      >
+                        Submit
+                        {editLoading ? (
+                          <RiLoader2Fill className="w-6 h-6 animate-spin text-white" />
+                        ) : null}
+                      </button>
+                    </div>
+                  </form>
+                </Dialog.Panel>
+              </Transition.Child>
+            </div>
+          </div>
+        </Dialog>
+      </Transition>
     </div>
   );
 };

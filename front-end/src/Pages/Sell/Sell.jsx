@@ -7,7 +7,7 @@ import Loader from "../../components/Loader/Loader";
 const Sell = () => {
   const [tableData, setTableData] = useState([]);
   const [loading, setLoading] = useState(false);
-
+  // console.log(tableData);
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);

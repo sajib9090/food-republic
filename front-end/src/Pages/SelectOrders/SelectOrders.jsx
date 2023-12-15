@@ -29,8 +29,19 @@ const SelectOrders = () => {
   const componentRef = useRef();
   const navigate = useNavigate();
 
+  const [searchInputValue, setSearchInputValue] = useState("");
+
+  const handleSearchInputChange = (event) => {
+    event.preventDefault();
+    setSearchInputValue(event.target.value);
+  };
+  const filteredMenuItems = menuItems?.filter((item) =>
+    item?.item_name?.toLowerCase().includes(searchInputValue.toLowerCase())
+  );
+
+  // console.log(filteredMenuItems);
   //carts items sum calculation
-  const totalPrice = carts?.reduce((sum, currentItem) => {
+  const totalPrice = tableWiseCart?.reduce((sum, currentItem) => {
     const itemTotal =
       currentItem.item_price_per_unit * currentItem.item_quantity;
     return sum + itemTotal;
@@ -95,7 +106,7 @@ const SelectOrders = () => {
   const handleCart = (item, tableName) => {
     handleAddToBill(item, tableName);
     toast.success(item.item_name + " added", {
-      autoClose: 500, // Set the timeout in milliseconds
+      autoClose: 500,
     });
   };
 
@@ -168,7 +179,19 @@ const SelectOrders = () => {
         Order For {name}
       </h1>
 
-      <div className="min-h-screen grid grid-cols-3 gap-2">
+      <div>
+        <form className="max-w-md mx-auto my-6">
+          <input
+            value={searchInputValue}
+            onChange={handleSearchInputChange}
+            className="h-[50px] w-full border-2 border-gray-500 rounded px-2 text-2xl shadow-inner"
+            type="search"
+            name="searchInput"
+            placeholder="Search menu item here..."
+          />
+        </form>
+      </div>
+      <div className="min-h-screen grid grid-cols-4 gap-2">
         {categories
           ?.sort((a, b) => a?.category?.localeCompare(b.category))
           .map((category, index) => (
@@ -188,7 +211,7 @@ const SelectOrders = () => {
                 <HyphenToSpaceConverter inputString={category.category} />
               </div>
 
-              {menuItems
+              {filteredMenuItems
                 ?.filter((item) => item?.category === category.category)
                 .map((item, i) => (
                   <div

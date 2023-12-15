@@ -16,6 +16,7 @@ const SoldInvoice = () => {
   const componentRef = useRef();
   const navigate = useNavigate();
 
+  // console.log(carts);
   let grandTotal =
     soldInvoice.items && Array.isArray(soldInvoice.items)
       ? soldInvoice.items.reduce(
@@ -39,8 +40,8 @@ const SoldInvoice = () => {
     }
   }, [id]);
 
-  const handleBackToSell = () => {
-    handleRemoveAllSoldCart();
+  const handleBackToSell = (tableCode) => {
+    handleRemoveAllSoldCart(tableCode);
     navigate("/sell");
   };
   return (
@@ -141,7 +142,7 @@ const SoldInvoice = () => {
       </div>
       <div className="max-w-[310px] mx-auto text-right">
         <button
-          onClick={handleBackToSell}
+          onClick={() => handleBackToSell(soldInvoice?.table_name)}
           className="mt-2 px-6 py-2 bg-black rounded-md text-white hover:bg-opacity-80 duration-500 transition-all mr-2"
         >
           Back to sell

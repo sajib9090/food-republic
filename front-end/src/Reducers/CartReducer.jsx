@@ -44,9 +44,16 @@ const CartReducer = (state, action) => {
   }
 
   if (action.type === "REMOVE_CART") {
-    localStorage.removeItem("fr-bill-cart");
+    const { tableCode } = action.payload;
+
+    // Remove items that match the tableCode
+    const updatedCart = state?.carts?.filter(
+      (cartItem) => cartItem.table_name !== tableCode
+    );
+
     return {
-      carts: [],
+      ...state,
+      carts: updatedCart,
     };
   }
 

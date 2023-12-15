@@ -6,6 +6,7 @@ import Home from "../Pages/Home/Home";
 import Login from "../Pages/Login/Login";
 import PrivateRoute from "./PrivateRoute";
 import PrimaryLoader from "../components/PrimaryLoader/PrimaryLoader";
+import Error from "../Pages/Error/Error";
 const Sell = lazy(() => import("../Pages/Sell/Sell"));
 const SelectOrders = lazy(() => import("../Pages/SelectOrders/SelectOrders"));
 const Dashboard = lazy(() => import("../Pages/Dashboard/Dashboard"));
@@ -61,7 +62,7 @@ export const router = createBrowserRouter([
         <Main />
       </PrivateRoute>
     ),
-    errorElement: <h1>Error</h1>,
+    errorElement: <Error />,
     children: [
       {
         path: "/",

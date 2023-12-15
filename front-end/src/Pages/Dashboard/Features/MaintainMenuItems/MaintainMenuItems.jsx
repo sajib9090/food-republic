@@ -241,7 +241,7 @@ const MaintainMenuItems = () => {
               </Disclosure>
             </div>
           </div>
-          <div className="min-h-screen grid grid-cols-3 gap-0.5 mt-6">
+          <div className="min-h-screen grid grid-cols-4 gap-0.5 mt-6">
             {categories
               ?.sort((a, b) => a?.category?.localeCompare(b.category))
               .map((category) => (

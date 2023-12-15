@@ -34,8 +34,9 @@ const CartProvider = ({ children }) => {
     dispatch({ type: "REMOVE_SINGLE_ITEM", payload: item });
   };
 
-  const handleRemoveAllSoldCart = () => {
-    dispatch({ type: "REMOVE_CART" });
+  const handleRemoveAllSoldCart = (tableCode) => {
+    dispatch({ type: "REMOVE_CART", payload: { tableCode } });
+    // console.log(fullCart, tableCode);
   };
 
   //add cart data inside local storage

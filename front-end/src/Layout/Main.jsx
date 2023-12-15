@@ -58,7 +58,7 @@ const Main = () => {
     token: { colorBgContainer },
   } = theme.useToken();
   return (
-    <div className="max-w-[96rem] mx-auto">
+    <div className="max-w-[118rem] mx-auto">
       <Layout className="min-h-screen">
         <Sider trigger={null} collapsible collapsed={collapsed}>
           {collapsed ? (
