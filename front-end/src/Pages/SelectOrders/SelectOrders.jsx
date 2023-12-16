@@ -184,7 +184,7 @@ const SelectOrders = () => {
           <input
             value={searchInputValue}
             onChange={handleSearchInputChange}
-            className="h-[50px] w-full border-2 border-gray-500 rounded px-2 text-2xl shadow-inner"
+            className="h-[40px] w-full border-2 border-gray-500 rounded px-2 text-xl shadow-inner"
             type="search"
             name="searchInput"
             placeholder="Search menu item here..."
