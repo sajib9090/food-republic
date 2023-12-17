@@ -2,6 +2,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { RiLoader2Line } from "react-icons/ri";
+import CurrencyFormatter from "../../../../components/CurrencyFormatter/CurrencyFormatter";
 
 const SellHistory = () => {
   const [selectedMonth, setSelectedMonth] = useState("");
@@ -10,6 +11,29 @@ const SellHistory = () => {
   const [totalDaysInMonth, setTotalDaysInMonth] = useState(0);
   const [sellData, setSellData] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  const [totalBillByMonth, setTotalBillByMonth] = useState({});
+  const [totalDiscountByMonth, setTotalDiscountByMonth] = useState({});
+
+  useEffect(() => {
+    const calculateTotals = () => {
+      const totalBillResult = findDataByMonth?.reduce((acc, item) => {
+        acc += item.total_bill;
+        return acc;
+      }, 0);
+
+      const totalDiscountResult = findDataByMonth?.reduce((acc, item) => {
+        acc += item.total_discount;
+        return acc;
+      }, 0);
+
+      // Set the results as new states
+      setTotalBillByMonth(totalBillResult);
+      setTotalDiscountByMonth(totalDiscountResult);
+    };
+
+    calculateTotals();
+  }, [findDataByMonth]);
 
   const handleSelectDate = () => {
     setSelectedMonth(selectedMonth);
@@ -181,6 +205,28 @@ const SellHistory = () => {
                           </td>
                         </tr>
                       </tbody>
+                      <div className="space-y-2 mt-4 mb-2 ml-2 text-xl">
+                        <div className="flex font-bold space-x-36">
+                          <div>Total Sell: </div>
+                          <div>
+                            <CurrencyFormatter value={totalBillByMonth} />
+                          </div>
+                        </div>
+                        <div className="flex font-bold space-x-[95px] text-red-600">
+                          <div>Total Discount: </div>
+                          <div>
+                            <CurrencyFormatter value={totalDiscountByMonth} />
+                          </div>
+                        </div>
+                        <div className="flex font-bold space-x-[157px] text-blue-700">
+                          <div>Net Sell: </div>
+                          <div className="text-2xl font-extrabold">
+                            <CurrencyFormatter
+                              value={totalBillByMonth - totalDiscountByMonth}
+                            />
+                          </div>
+                        </div>
+                      </div>
                     </table>
                   )}
                 </>

@@ -13,6 +13,7 @@ const MaintainMembers = () => {
   let [findEditData, setFindEditData] = useState({});
   let [loading, setLoading] = useState(false);
 
+  console.log(allMember);
   const handleSubmit = (e) => {
     e.preventDefault();
     const name = e.target.name.value;

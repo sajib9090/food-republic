@@ -50,7 +50,7 @@ const Sell = () => {
                   key={item._id}
                   className={`h-[200px] border border-gray-200 rounded-full shadow-xl flex flex-col justify-center items-center ${
                     uniqueTableNames?.includes(item?.name)
-                      ? "bg-purple-200"
+                      ? "bg-red-400"
                       : "hover:bg-[#1677ff1f] cursor-pointer hover:text-[#1677FF] duration-700"
                   }`}
                 >
