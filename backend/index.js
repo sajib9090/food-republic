@@ -42,7 +42,7 @@ async function run() {
     const ExpensesCollection = client.db("FoodRepublic").collection("expenses");
 
     const MemberCollection = client.db("FoodRepublic").collection("members");
-
+    const StaffCollection = client.db("FoodRepublic").collection("staff");
     // API endpoint to get the list of tables from the collection
 
     app.get("/api/get-categories", async (req, res) => {
@@ -284,6 +284,31 @@ async function run() {
         res.json(users);
       } catch (error) {
         res.status(500).send("Error fetching user data from the database");
+      }
+    });
+    app.patch("/api/update-user/:id", async (req, res) => {
+      const userId = req.params.id;
+
+      try {
+        // Assuming req.body contains the updated user data
+        const updatedUserData = req.body;
+
+        // Validate and process the updated data as needed
+
+        // Update the user in the database
+        const result = await usersCollection.updateOne(
+          { _id: new ObjectId(userId) },
+          { $set: updatedUserData }
+        );
+
+        if (result.modifiedCount > 0) {
+          res.json({ success: true, message: "User updated successfully" });
+        } else {
+          res.status(404).json({ success: false, message: "User not found" });
+        }
+      } catch (error) {
+        console.error(error);
+        res.status(500).send("Error updating user data");
       }
     });
     app.post("/api/add-user", async (req, res) => {
@@ -817,7 +842,7 @@ async function run() {
 
     app.post("/api/add-member", async (req, res) => {
       const { name, mobile } = req.body;
-      const discountValue = 15; // Set the default discount value to 15
+      const discountValue = 10; // Set the default discount value to 15
       const createdDate = new Date(); // Get the current date and time
 
       try {
@@ -870,6 +895,88 @@ async function run() {
           message: "Member deleted successfully",
           deletedCount: result.deletedCount,
         });
+      } catch (error) {
+        console.error("Database Deletion Error:", error);
+        res.status(500).send("Error deleting data from the database");
+      }
+    });
+
+    //staff api
+    app.get("/api/get-all-staff", async (req, res) => {
+      try {
+        // Retrieve all staff data from the collection and sort alphabetically by the "name" field
+        const allStaff = await StaffCollection.find()
+          .sort({ name: 1 })
+          .toArray();
+
+        res.json({
+          message:
+            "All staff data retrieved and sorted alphabetically successfully",
+          staffData: allStaff,
+        });
+      } catch (error) {
+        console.error("Database Retrieval Error:", error);
+        res.status(500).send("Error retrieving data from the database");
+      }
+    });
+
+    app.post("/api/add-staff", async (req, res) => {
+      const { name } = req.body;
+
+      const createdDate = new Date();
+
+      try {
+        // Check if a member with the same mobile number already exists
+        const existingStaff = await StaffCollection.findOne({
+          name: name.toLowerCase(),
+        });
+
+        if (existingStaff) {
+          return res.status(400).json({
+            message: "A staff with this name already exists.",
+          });
+        }
+
+        // Insert member data into the collection
+        const result = await StaffCollection.insertOne({
+          name: name.toLowerCase(),
+          createdDate,
+        });
+
+        res.json({
+          message: "Staff added successfully",
+          insertedId: result.insertedId,
+        });
+      } catch (error) {
+        console.error("Database Insertion Error:", error);
+        res.status(500).send("Error inserting data into the database");
+      }
+    });
+
+    app.delete("/api/delete-staff/:id", async (req, res) => {
+      const staffId = req.params.id;
+
+      try {
+        // Validate if staffId is a valid ObjectId
+        if (!ObjectId.isValid(staffId)) {
+          return res.status(400).json({ message: "Invalid staff ID format" });
+        }
+
+        // Convert staffId to ObjectId
+        const objectIdStaffId = new ObjectId(staffId);
+
+        // Delete staff data from the collection based on the provided ID
+        const deleteResult = await StaffCollection.deleteOne({
+          _id: objectIdStaffId,
+        });
+
+        if (deleteResult.deletedCount === 1) {
+          res.json({
+            message: "Staff data deleted successfully",
+          });
+        } else {
+          res.status(404).json({ message: "Staff not found" });
+        }
       } catch (error) {
         console.error("Database Deletion Error:", error);
         res.status(500).send("Error deleting data from the database");
