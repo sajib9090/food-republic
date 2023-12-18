@@ -518,7 +518,8 @@ async function run() {
     );
 
     app.post("/api/post-sold-invoices", async (req, res) => {
-      const { table_name, items, total_bill, total_discount } = req.body;
+      const { table_name, served_by, items, total_bill, total_discount } =
+        req.body;
       const createdDate = new Date();
 
       try {
@@ -531,6 +532,7 @@ async function run() {
         // Insert the new document
         const result = await SoldItemsCollection.insertOne({
           table_name,
+          served_by,
           items: itemsWithTotalPrice,
           total_bill,
           total_discount,
@@ -824,6 +826,10 @@ async function run() {
         }
 
         // Update member fields
+        const currentTotalDiscount = member.total_discount || 0; // If total_discount is undefined, assume 0
+        const newTotalDiscount = updatedFields.total_discount || 0; // If total_discount is not provided in the request body, assume 0
+        updatedFields.total_discount = currentTotalDiscount + newTotalDiscount;
+
         const updatedMember = await MemberCollection.findOneAndUpdate(
           { mobile: mobileNumber },
           { $set: updatedFields },
