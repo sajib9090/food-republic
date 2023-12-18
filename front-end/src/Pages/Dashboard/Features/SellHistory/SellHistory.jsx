@@ -11,7 +11,6 @@ const SellHistory = () => {
   const [totalDaysInMonth, setTotalDaysInMonth] = useState(0);
   const [sellData, setSellData] = useState([]);
   const [loading, setLoading] = useState(false);
-
   const [totalBillByMonth, setTotalBillByMonth] = useState({});
   const [totalDiscountByMonth, setTotalDiscountByMonth] = useState({});
 

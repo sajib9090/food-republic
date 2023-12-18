@@ -153,6 +153,7 @@ const SelectOrders = () => {
       if (result.isConfirmed) {
         const soldItems = {
           table_name: tableName,
+          served_by: staffValidation,
           items: invoiceData,
           total_bill: totalPrice,
           total_discount: totalDiscount,

@@ -59,6 +59,9 @@ const StaffRecord = lazy(() =>
 const AddStaff = lazy(() =>
   import("../Pages/Dashboard/StaffRecord/AddStaff/AddStaff")
 );
+const StaffSellRecord = lazy(() =>
+  import("../Pages/Dashboard/StaffRecord/StaffSellRecord/StaffSellRecord")
+);
 
 export const router = createBrowserRouter([
   {
@@ -119,6 +122,14 @@ export const router = createBrowserRouter([
                 element: (
                   <Suspense fallback={<PrimaryLoader />}>
                     <AddStaff />
+                  </Suspense>
+                ),
+              },
+              {
+                path: "staff-sell-record",
+                element: (
+                  <Suspense fallback={<PrimaryLoader />}>
+                    <StaffSellRecord />
                   </Suspense>
                 ),
               },

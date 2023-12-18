@@ -7,6 +7,11 @@ const StaffRecord = () => {
       title: "Add Staff",
       link: "add-staff",
     },
+    {
+      id: 2,
+      title: "Staff Sell Record",
+      link: "staff-sell-record",
+    },
   ];
 
   return (
