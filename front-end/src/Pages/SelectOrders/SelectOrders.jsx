@@ -25,7 +25,8 @@ const SelectOrders = () => {
   const [memberShipDiscount, setMemberShipDiscount] = useState(null);
   const [availableDiscount, setAvailableDiscount] = useState(false);
   const { categories, menuItems, staffs } = useItemsContext();
-  const { handleAddToBill, carts, itemRemove } = useCartContext();
+  const { handleAddToBill, carts, itemRemove, handleRemoveAllSoldCart } =
+    useCartContext();
   const componentRef = useRef();
   const navigate = useNavigate();
 
@@ -168,6 +169,7 @@ const SelectOrders = () => {
                 html: `Items have been sold<br>ID: ${res.data.insertedId}`,
                 icon: "success",
               });
+              handleRemoveAllSoldCart(tableName);
               navigate(`${res.data.insertedId}`);
             }
           })

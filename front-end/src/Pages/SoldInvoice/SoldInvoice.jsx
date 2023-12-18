@@ -6,13 +6,13 @@ import HyphenToSpaceConverter from "../../components/HyphenToSpaceConverter/Hyph
 import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import ReactToPrint from "react-to-print";
-import { useCartContext } from "../../GlobalContext/CartContext";
+// import { useCartContext } from "../../GlobalContext/CartContext";
 import toast from "react-hot-toast";
 
 const SoldInvoice = () => {
   const { id } = useParams();
   const [soldInvoice, setSoldInvoice] = useState({});
-  const { handleRemoveAllSoldCart } = useCartContext();
+  // const { handleRemoveAllSoldCart } = useCartContext();
   const componentRef = useRef();
   const navigate = useNavigate();
 
@@ -40,8 +40,8 @@ const SoldInvoice = () => {
     }
   }, [id]);
 
-  const handleBackToSell = (tableCode) => {
-    handleRemoveAllSoldCart(tableCode);
+  const handleBackToSell = () => {
+    // handleRemoveAllSoldCart(tableCode);
     navigate("/sell");
   };
   return (
@@ -142,7 +142,8 @@ const SoldInvoice = () => {
       </div>
       <div className="max-w-[310px] mx-auto text-right">
         <button
-          onClick={() => handleBackToSell(soldInvoice?.table_name)}
+          // onClick={() => handleBackToSell(soldInvoice?.table_name)}
+          onClick={() => handleBackToSell()}
           className="mt-2 px-6 py-2 bg-black rounded-md text-white hover:bg-opacity-80 duration-500 transition-all mr-2"
         >
           Back to sell
