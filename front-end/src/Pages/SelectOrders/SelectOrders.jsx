@@ -31,6 +31,13 @@ const SelectOrders = () => {
 
   const [searchInputValue, setSearchInputValue] = useState("");
   const [selectedStaff, setSelectedStaff] = useState("");
+  const [staffValidation, setStaffValidation] = useState("");
+
+  useEffect(() => {
+    if (tableWiseCart) {
+      setStaffValidation(tableWiseCart[0]?.staffName);
+    }
+  }, [tableWiseCart]);
 
   const handleStaffSelect = (event) => {
     setSelectedStaff(event.target.value);
@@ -44,7 +51,6 @@ const SelectOrders = () => {
     item?.item_name?.toLowerCase().includes(searchInputValue.toLowerCase())
   );
 
-  // console.log(filteredMenuItems);
   //carts items sum calculation
   const totalPrice = tableWiseCart?.reduce((sum, currentItem) => {
     const itemTotal =
@@ -109,12 +115,12 @@ const SelectOrders = () => {
   };
 
   const handleCart = (item, tableName, staffName) => {
-    if (staffName) {
+    if (staffName || staffValidation) {
       handleAddToBill(item, tableName, staffName);
       toast.success(item.item_name + " added", {
         autoClose: 500,
       });
-    } else {
+    } else if (!staffName) {
       toast.error("Select Staff Name First");
     }
   };
@@ -189,7 +195,7 @@ const SelectOrders = () => {
       </h1>
 
       <div className="mt-0">
-        {!selectedStaff ? (
+        {!staffValidation ? (
           <div className="flex flex-col">
             <label>Select Staff*</label>
             <select
