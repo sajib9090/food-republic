@@ -53,6 +53,12 @@ const MaintainMembers = lazy(() =>
 const MaintainMenuItems = lazy(() =>
   import("../Pages/Dashboard/Features/MaintainMenuItems/MaintainMenuItems")
 );
+const StaffRecord = lazy(() =>
+  import("../Pages/Dashboard/StaffRecord/StaffRecord")
+);
+const AddStaff = lazy(() =>
+  import("../Pages/Dashboard/StaffRecord/AddStaff/AddStaff")
+);
 
 export const router = createBrowserRouter([
   {
@@ -100,6 +106,24 @@ export const router = createBrowserRouter([
           </Suspense>
         ),
         children: [
+          {
+            path: "staff-record",
+            element: (
+              <Suspense fallback={<PrimaryLoader />}>
+                <StaffRecord />
+              </Suspense>
+            ),
+            children: [
+              {
+                path: "add-staff",
+                element: (
+                  <Suspense fallback={<PrimaryLoader />}>
+                    <AddStaff />
+                  </Suspense>
+                ),
+              },
+            ],
+          },
           {
             path: "inventory",
             element: (

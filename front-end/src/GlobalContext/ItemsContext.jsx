@@ -9,6 +9,7 @@ const ItemsProvider = ({ children }) => {
   const [categories, setCategories] = useState([]);
   const [menuItems, setMenuItems] = useState([]);
   const [tables, setTables] = useState([]);
+  const [staffs, setStaffs] = useState([]);
   const [menuItemsLoading, setMenuItemsLoading] = useState(false);
 
   // ... other functions ...
@@ -51,11 +52,21 @@ const ItemsProvider = ({ children }) => {
     }
   };
 
+  const getStaff = async (url) => {
+    try {
+      const res = await axios.get(url);
+      setStaffs(res?.data?.staffData);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   //all products
   useEffect(() => {
     getMenus(`${import.meta.env.VITE_API_URL}/api/get-menu-items`);
     getCategories(`${import.meta.env.VITE_API_URL}/api/get-categories`);
     getTables(`${import.meta.env.VITE_API_URL}/api/tables`);
+    getStaff(`${import.meta.env.VITE_API_URL}/api/get-all-staff`);
   }, [productsKey]);
 
   return (
@@ -66,6 +77,7 @@ const ItemsProvider = ({ children }) => {
         menuItems,
         tables,
         menuItemsLoading,
+        staffs,
       }}
     >
       {children}

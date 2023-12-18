@@ -1,6 +1,6 @@
 const CartReducer = (state, action) => {
   if (action.type === "ADD_TO_BILL") {
-    let { item, tableName } = action.payload;
+    let { item, tableName, staffName } = action.payload;
 
     // Check if the item already exists in the cart
     const existingCartItemIndex = state.carts.findIndex(
@@ -25,6 +25,7 @@ const CartReducer = (state, action) => {
         item_price_per_unit: item.item_price,
         item_quantity: 1,
         table_name: tableName,
+        staffName: staffName,
       };
 
       return {

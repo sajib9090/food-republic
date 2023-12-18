@@ -24,12 +24,17 @@ const SelectOrders = () => {
   const [tableWiseCart, setTableWiseCart] = useState([]);
   const [memberShipDiscount, setMemberShipDiscount] = useState(null);
   const [availableDiscount, setAvailableDiscount] = useState(false);
-  const { categories, menuItems } = useItemsContext();
+  const { categories, menuItems, staffs } = useItemsContext();
   const { handleAddToBill, carts, itemRemove } = useCartContext();
   const componentRef = useRef();
   const navigate = useNavigate();
 
   const [searchInputValue, setSearchInputValue] = useState("");
+  const [selectedStaff, setSelectedStaff] = useState("");
+
+  const handleStaffSelect = (event) => {
+    setSelectedStaff(event.target.value);
+  };
 
   const handleSearchInputChange = (event) => {
     event.preventDefault();
@@ -103,11 +108,15 @@ const SelectOrders = () => {
     }
   };
 
-  const handleCart = (item, tableName) => {
-    handleAddToBill(item, tableName);
-    toast.success(item.item_name + " added", {
-      autoClose: 500,
-    });
+  const handleCart = (item, tableName, staffName) => {
+    if (staffName) {
+      handleAddToBill(item, tableName, staffName);
+      toast.success(item.item_name + " added", {
+        autoClose: 500,
+      });
+    } else {
+      toast.error("Select Staff Name First");
+    }
   };
 
   //
@@ -179,12 +188,35 @@ const SelectOrders = () => {
         Order For {name}
       </h1>
 
-      <div>
-        <form className="max-w-md mx-auto my-6">
+      <div className="mt-0">
+        {!selectedStaff ? (
+          <div className="flex flex-col">
+            <label>Select Staff*</label>
+            <select
+              onChange={handleStaffSelect}
+              value={selectedStaff}
+              className="h-[40px] w-[200px] bg-gray-200  rounded text-black px-2"
+            >
+              <option value="" selected disabled>
+                Select Staff
+              </option>
+              {staffs?.map((item) => (
+                <option
+                  className="text-black font-semibold text-base capitalize"
+                  key={item._id}
+                  value={item?.name}
+                >
+                  {item?.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        ) : null}
+        <form className="max-w-md mx-auto mb-6">
           <input
             value={searchInputValue}
             onChange={handleSearchInputChange}
-            className="h-[40px] w-full border-2 border-gray-500 rounded px-2 text-xl shadow-inner"
+            className="h-[50px] w-full border-2 border-gray-500 rounded px-2 text-2xl shadow-inner"
             type="search"
             name="searchInput"
             placeholder="Search menu item here..."
@@ -217,7 +249,7 @@ const SelectOrders = () => {
                   <div
                     key={item._id}
                     onClick={() => {
-                      handleCart(item, name);
+                      handleCart(item, name, selectedStaff);
                     }}
                     className="flex justify-between items-center shadow-md mt-4 pb-2 px-2 border-b border-gray-300 cursor-pointer"
                   >

@@ -14,6 +14,7 @@ const Sell = () => {
     carts && carts?.length > 0
       ? [...new Set(carts?.map((item) => item?.table_name))]
       : [];
+
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
@@ -44,20 +45,36 @@ const Sell = () => {
           </h1>
           <div className="grid grid-cols-4 gap-6">
             {tableData &&
-              tableData?.map((item) => (
-                <Link
-                  to={`${item?.name}`}
-                  key={item._id}
-                  className={`h-[200px] border border-gray-200 rounded-full shadow-xl flex flex-col justify-center items-center ${
-                    uniqueTableNames?.includes(item?.name)
-                      ? "bg-red-400"
-                      : "hover:bg-[#1677ff1f] cursor-pointer hover:text-[#1677FF] duration-700"
-                  }`}
-                >
-                  <MdDining className="h-12 w-12 mb-2" />
-                  <h1 className="text-lg font-bold capitalize">{item.name}</h1>
-                </Link>
-              ))}
+              tableData?.map((table) => {
+                const staffNameForTable = carts?.find(
+                  (cart) => cart?.table_name === table?.name
+                )?.staffName;
+
+                return (
+                  <Link
+                    to={`${table?.name}`}
+                    key={table._id}
+                    className={`h-[200px] border border-gray-200 rounded-full shadow-xl flex flex-col justify-center items-center ${
+                      uniqueTableNames?.includes(table?.name)
+                        ? "bg-red-300"
+                        : "hover:bg-[#1677ff1f] cursor-pointer hover:text-[#1677FF] duration-700"
+                    }`}
+                  >
+                    <MdDining className="h-12 w-12 mb-2" />
+                    <h1 className="text-lg font-bold capitalize">
+                      {table.name}
+                    </h1>
+                    {staffNameForTable && (
+                      <p className="text-sm text-gray-600 capitalize mt-1">
+                        Pending by{" "}
+                        <span className="text-red-900 font-extrabold">
+                          {staffNameForTable}
+                        </span>
+                      </p>
+                    )}
+                  </Link>
+                );
+              })}
           </div>
         </div>
       )}
