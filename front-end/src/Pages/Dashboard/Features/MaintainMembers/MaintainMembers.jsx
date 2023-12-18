@@ -12,8 +12,9 @@ const MaintainMembers = () => {
   let [isOpen, setIsOpen] = useState(false);
   let [findEditData, setFindEditData] = useState({});
   let [loading, setLoading] = useState(false);
+  let [memberLoading, setMemberLoading] = useState(true);
 
-  console.log(allMember);
+  // console.log(allMember);
   const handleSubmit = (e) => {
     e.preventDefault();
     const name = e.target.name.value;
@@ -47,19 +48,11 @@ const MaintainMembers = () => {
         });
     }
   };
-  const handleEdit = (mobile) => {
-    if (mobile) {
-      axios
-        .get(`${import.meta.env.VITE_API_URL}/api/get-members?search=${mobile}`)
-        .then((res) => {
-          setFindEditData(res.data.member);
-          if (res.data.member.mobile) {
-            setIsOpen(!isOpen);
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-        });
+  // console.log(findEditData);
+  const handleEdit = (editMember) => {
+    if (editMember) {
+      setFindEditData(editMember);
+      setIsOpen(!isOpen);
     }
   };
 
@@ -87,8 +80,10 @@ const MaintainMembers = () => {
           `${import.meta.env.VITE_API_URL}/api/get-members`
         );
         setAllMember(response.data.members);
+        setMemberLoading(false);
       } catch (error) {
         console.error("Error fetching data:", error);
+        setMemberLoading(false);
       }
     };
 
@@ -98,49 +93,53 @@ const MaintainMembers = () => {
     <div className="flex w-full gap-4">
       <div className="w-[50%] min-h-screen shadow-md px-4">
         <h1 className="text-lg font-bold mb-2">Members List</h1>
-        <div>
-          {allMember &&
-            allMember
-              .sort((a, b) => a.name.localeCompare(b.name))
-              .map((item, index) => (
-                <div
-                  key={item._id}
-                  className="w-full min-h-[40px] border-b border-gray-300 flex justify-between items-center"
-                >
-                  <div className="flex items-center text-xs text-gray-500 font-bold w-[240px]">
-                    <p className="mr-1">{index + 1}.</p>
-                    <p className="capitalize">{item.name}</p>
-                  </div>
-                  <div className="text-xs text-gray-500">
-                    <p>{item.mobile}</p>
-                    <div>
-                      {/* Assuming DateFormatter is a component that formats the date */}
-                      <DateFormatter dateString={item.createdDate} />
+        {memberLoading ? (
+          <div className="text-center mt-4 text-base">Please wait...</div>
+        ) : (
+          <div>
+            {allMember &&
+              allMember
+                .sort((a, b) => a.name.localeCompare(b.name))
+                .map((item, index) => (
+                  <div
+                    key={item._id}
+                    className="w-full min-h-[40px] border-b border-gray-300 flex justify-between items-center"
+                  >
+                    <div className="flex items-center text-xs text-gray-500 font-bold w-[240px]">
+                      <p className="mr-1">{index + 1}.</p>
+                      <p className="capitalize">{item.name}</p>
+                    </div>
+                    <div className="text-xs text-gray-500">
+                      <p>{item.mobile}</p>
+                      <div>
+                        {/* Assuming DateFormatter is a component that formats the date */}
+                        <DateFormatter dateString={item.createdDate} />
+                      </div>
+                    </div>
+                    <div className="text-xs text-gray-500">
+                      <p>Discount Value</p>
+                      <p>{item.discountValue}%</p>
+                    </div>
+                    <div className="flex items-center space-x-4">
+                      <div>
+                        <FaEdit
+                          onClick={() => handleEdit(item)}
+                          className="h-4 w-4 cursor-pointer text-blue-600"
+                          title="Edit"
+                        />
+                      </div>
+                      <div>
+                        <MdDelete
+                          onClick={() => handleDelete(item.mobile)}
+                          className="h-5 w-5 cursor-pointer text-red-600"
+                          title="Delete"
+                        />
+                      </div>
                     </div>
                   </div>
-                  <div className="text-xs text-gray-500">
-                    <p>Discount Value</p>
-                    <p>{item.discountValue}%</p>
-                  </div>
-                  <div className="flex items-center space-x-4">
-                    <div>
-                      <FaEdit
-                        onClick={() => handleEdit(item.mobile)}
-                        className="h-4 w-4 cursor-pointer text-blue-600"
-                        title="Edit"
-                      />
-                    </div>
-                    <div>
-                      <MdDelete
-                        onClick={() => handleDelete(item.mobile)}
-                        className="h-5 w-5 cursor-pointer text-red-600"
-                        title="Delete"
-                      />
-                    </div>
-                  </div>
-                </div>
-              ))}
-        </div>
+                ))}
+          </div>
+        )}
       </div>
       <div className="w-[50%] min-h-screen shadow-md px-4">
         {/* <h1 className="text-lg font-bold">Search Member</h1>

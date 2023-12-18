@@ -16,7 +16,7 @@ const SoldInvoice = () => {
   const componentRef = useRef();
   const navigate = useNavigate();
 
-  // console.log(carts);
+  // console.log(soldInvoice);
   let grandTotal =
     soldInvoice.items && Array.isArray(soldInvoice.items)
       ? soldInvoice.items.reduce(
@@ -74,6 +74,12 @@ const SoldInvoice = () => {
           </p>
           <p className="capitalize text-xs">{soldInvoice?.table_name}</p>
         </div>
+        <p className="text-[8px] pl-2">
+          Served by:{" "}
+          <span className="capitalize">
+            {soldInvoice && soldInvoice?.served_by}
+          </span>
+        </p>
         <div className="mt-2 px-1">
           <div className="min-h-[30px] border-b border-black flex justify-between items-center px-3 text-[10px]">
             <div>Items</div>

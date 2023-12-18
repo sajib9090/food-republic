@@ -22,6 +22,7 @@ const SelectOrders = () => {
   let [loading, setLoading] = useState(false);
   let [number, setNumber] = useState("");
   const [tableWiseCart, setTableWiseCart] = useState([]);
+  const [member, setMember] = useState({});
   const [memberShipDiscount, setMemberShipDiscount] = useState(null);
   const [availableDiscount, setAvailableDiscount] = useState(false);
   const { categories, menuItems, staffs } = useItemsContext();
@@ -67,6 +68,7 @@ const SelectOrders = () => {
         .get(`${import.meta.env.VITE_API_URL}/api/get-members?search=${number}`)
         .then((res) => {
           if (res.data.member.discountValue) {
+            setMember(res.data.member);
             setMemberShipDiscount(res.data.member.discountValue);
             setAvailableDiscount(true);
           }
@@ -170,8 +172,30 @@ const SelectOrders = () => {
                 html: `Items have been sold<br>ID: ${res.data.insertedId}`,
                 icon: "success",
               });
-              handleRemoveAllSoldCart(tableName);
-              navigate(`${res.data.insertedId}`);
+              const memberData = {
+                total_discount: parseFloat(totalDiscount),
+              };
+              if (totalDiscount && member) {
+                axios
+                  .patch(
+                    `${import.meta.env.VITE_API_URL}/api/update-member/${
+                      member?.mobile
+                    }`,
+                    memberData
+                  )
+                  .then((response) => {
+                    if (response) {
+                      handleRemoveAllSoldCart(tableName);
+                      navigate(`${res.data.insertedId}`);
+                    }
+                  })
+                  .catch((err) => {
+                    console.log(err);
+                  });
+              } else {
+                handleRemoveAllSoldCart(tableName);
+                navigate(`${res.data.insertedId}`);
+              }
             }
           })
           .catch((err) => {
