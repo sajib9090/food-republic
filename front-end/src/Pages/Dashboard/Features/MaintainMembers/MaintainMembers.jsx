@@ -6,6 +6,7 @@ import DateFormatter from "../../../../components/DateFormatter/DateFormatter";
 import toast from "react-hot-toast";
 import { Dialog, Transition } from "@headlessui/react";
 import { RiLoader2Line } from "react-icons/ri";
+import CurrencyFormatter from "../../../../components/CurrencyFormatter/CurrencyFormatter";
 
 const MaintainMembers = () => {
   const [allMember, setAllMember] = useState([]);
@@ -114,6 +115,22 @@ const MaintainMembers = () => {
                       <div>
                         {/* Assuming DateFormatter is a component that formats the date */}
                         <DateFormatter dateString={item.createdDate} />
+                      </div>
+                    </div>
+                    <div className="text-xs text-gray-500">
+                      <p className="text-black">Got Total Discount</p>
+                      <div
+                        className={`${
+                          item?.total_discount
+                            ? "text-red-600 font-bold"
+                            : "text-green-600"
+                        }`}
+                      >
+                        <CurrencyFormatter
+                          value={
+                            item?.total_discount ? item?.total_discount : 0
+                          }
+                        />
                       </div>
                     </div>
                     <div className="text-xs text-gray-500">

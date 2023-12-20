@@ -499,13 +499,13 @@ const SelectOrders = () => {
                         onClick={() => setIsModalOpen(!isModalOpen)}
                         className="h-[40px] w-[130px] bg-blue-500 rounded-md text-white"
                       >
-                        Demo Invoice
+                        Kitchen Copy
                       </button>
                       <button
                         onClick={() => handleSell(tableWiseCart, name)}
                         className="h-[40px] w-[130px] bg-purple-800 rounded-md text-white"
                       >
-                        Final Invoice
+                        Customer Copy
                       </button>
                     </div>
                   ) : null}
@@ -625,8 +625,8 @@ const SelectOrders = () => {
                   <div className="text-center space-x-4 my-4">
                     <ReactToPrint
                       trigger={() => (
-                        <button className="h-[40px] w-[130px] bg-blue-500 rounded-md text-white">
-                          Print Demo
+                        <button className="h-[40px] w-[160px] bg-blue-500 rounded-md text-white">
+                          Print Kitchen Copy
                         </button>
                       )}
                       content={() => componentRef.current}
