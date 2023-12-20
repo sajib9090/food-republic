@@ -1,6 +1,9 @@
 import { NavLink, Outlet } from "react-router-dom";
+import { useUserContext } from "../../../GlobalContext/UserContext";
 
 const Features = () => {
+  const { singleUser } = useUserContext();
+
   const menu = [
     {
       id: 0,
@@ -22,7 +25,6 @@ const Features = () => {
       title: "Expense History",
       link: "expense-history",
     },
-
     {
       id: 4,
       title: "Maintain Void",
@@ -40,10 +42,13 @@ const Features = () => {
     },
   ];
 
+  const isAuthority =
+    singleUser?.role === "admin" || singleUser?.role === "chairman" || false;
+
   return (
     <div>
       <div className="min-h-[50px] w-full flex flex-wrap gap-2 items-center justify-center border-b border-blue-200 py-2">
-        {menu.map((item) => (
+        {menu?.slice(0, isAuthority ? menu?.length : 4).map((item) => (
           <NavLink
             to={item.link}
             key={item.id}
