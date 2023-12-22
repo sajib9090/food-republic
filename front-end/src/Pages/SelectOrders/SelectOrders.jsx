@@ -26,14 +26,29 @@ const SelectOrders = () => {
   const [memberShipDiscount, setMemberShipDiscount] = useState(null);
   const [availableDiscount, setAvailableDiscount] = useState(false);
   const { categories, menuItems, staffs } = useItemsContext();
-  const { handleAddToBill, carts, itemRemove, handleRemoveAllSoldCart } =
-    useCartContext();
+  const {
+    handleAddToBill,
+    carts,
+    itemRemove,
+    handleRemoveAllSoldCart,
+    itemQuantityIncrease,
+    itemQuantityDecrease,
+  } = useCartContext();
   const componentRef = useRef();
   const navigate = useNavigate();
 
   const [searchInputValue, setSearchInputValue] = useState("");
   const [selectedStaff, setSelectedStaff] = useState("");
-  const [staffValidation, setStaffValidation] = useState("");
+  const [staffValidation, setStaffValidation] = useState();
+
+  //quantity increase and decrease function
+  const handleQuantityIncrease = (item) => {
+    itemQuantityIncrease(item);
+  };
+  const handleQuantityDecrease = (item) => {
+    itemQuantityDecrease(item);
+  };
+  //end
 
   useEffect(() => {
     if (tableWiseCart) {
@@ -42,7 +57,12 @@ const SelectOrders = () => {
   }, [tableWiseCart]);
 
   const handleStaffSelect = (event) => {
-    setSelectedStaff(event.target.value);
+    const selectedValue = event.target.value;
+    setSelectedStaff(selectedValue);
+
+    if (!staffValidation) {
+      setStaffValidation(selectedValue);
+    }
   };
 
   const handleSearchInputChange = (event) => {
@@ -391,12 +411,28 @@ const SelectOrders = () => {
                                     </div>
                                   </div>
                                   <div className="flex items-center min-w-[35%]">
-                                    <div className="min-w-[20%] flex justify-end">
+                                    <div className="min-w-[30%] flex justify-end">
+                                      <button
+                                        onClick={() =>
+                                          handleQuantityDecrease(item)
+                                        }
+                                        className="bg-gray-300 px-2 rounded-l"
+                                      >
+                                        -
+                                      </button>
                                       <p className="px-2 text-gray-500 flex">
-                                        {item.item_quantity}
+                                        {item?.item_quantity}
                                       </p>
+                                      <button
+                                        onClick={() =>
+                                          handleQuantityIncrease(item)
+                                        }
+                                        className="bg-gray-300 px-2 rounded-r"
+                                      >
+                                        +
+                                      </button>
                                     </div>
-                                    <div className="min-w-[60%] flex justify-end">
+                                    <div className="min-w-[50%] flex justify-end">
                                       <CurrencyFormatter
                                         value={
                                           item.item_price_per_unit *
@@ -643,105 +679,3 @@ const SelectOrders = () => {
 };
 
 export default SelectOrders;
-
-{
-  /* <div className="min-h-screen border border-gray-200 shadow-xl rounded-md">
-          <div>
-            <h1 className="text-center rounded-md py-2 bg-[#001529] bg-opacity-75 text-white font-bold text-xl">
-              Drinks & Juices
-            </h1>
-          </div>
-          {drinksAndJuices &&
-            drinksAndJuices?.items?.map((item, index) => (
-              <div
-                onClick={() => {
-                  handleCart(item, name);
-                }}
-                key={item?._id}
-                className="flex justify-between items-center shadow-md mt-4 pb-2 px-2 border-b border-gray-300 cursor-pointer"
-              >
-                <div className="flex font-bold text-black text-lg">
-                  <div>
-                    <p className="mr-1">{index + 1}.</p>
-                  </div>
-                  <div>
-                    <p className="wrapped-text">
-                      <HyphenToSpaceConverter inputString={item?.item_name} />
-                    </p>
-                  </div>
-                </div>
-                <div>
-                  <button className="bg-[#001529] hover:bg-opacity-70 px-2 py-1 text-white rounded-md">
-                    <CurrencyFormatter value={item?.item_price} />
-                  </button>
-                </div>
-              </div>
-            ))}
-        </div>
-        <div className="min-h-screen border border-gray-200 shadow-xl rounded-md">
-          <div>
-            <h1 className="text-center rounded-md py-2 bg-[#aa5f34] bg-opacity-75 text-white font-bold text-xl">
-              Fast Food
-            </h1>
-          </div>
-          {fastFood &&
-            fastFood?.items?.map((item, index) => (
-              <div
-                onClick={() => {
-                  handleCart(item, name);
-                }}
-                key={item._id}
-                className="flex justify-between items-center mt-4 pb-2 shadow-md px-2 border-b border-gray-300 cursor-pointer"
-              >
-                <div className="flex font-bold text-black text-lg">
-                  <div>
-                    <p className="mr-1">{index + 1}.</p>
-                  </div>
-                  <div>
-                    <p className="capitalize wrapped-text">
-                      <HyphenToSpaceConverter inputString={item?.item_name} />
-                    </p>
-                  </div>
-                </div>
-                <div>
-                  <button className="bg-[#714226] hover:bg-opacity-70 px-2 py-1 text-white rounded-md">
-                    <CurrencyFormatter value={item?.item_price} />
-                  </button>
-                </div>
-              </div>
-            ))}
-        </div>
-        <div className="min-h-screen border border-gray-200 shadow-xl rounded-md">
-          <div>
-            <h1 className="text-center rounded-md py-2 bg-[#457322] bg-opacity-75 text-white font-bold text-xl">
-              Vegetables & Rice
-            </h1>
-          </div>
-          {vegetablesAndRices &&
-            vegetablesAndRices?.items?.map((item, index) => (
-              <div
-                onClick={() => {
-                  handleCart(item, name);
-                }}
-                key={item._id}
-                className="flex justify-between items-center mt-4 pb-2 shadow-md px-2 border-b border-gray-300 cursor-pointer"
-              >
-                <div className="flex font-bold text-black text-lg">
-                  <div>
-                    <p className="mr-1">{index + 1}.</p>
-                  </div>
-                  <div>
-                    <p className="capitalize wrapped-text">
-                      <HyphenToSpaceConverter inputString={item.item_name} />
-                    </p>
-                  </div>
-                </div>
-                <div>
-                  <button className="bg-[#416622] hover:bg-opacity-70 px-2 py-1 text-white rounded-md">
-                    <CurrencyFormatter value={item.item_price} />
-                  </button>
-                </div>
-              </div>
-            ))}
-        </div> */
-}

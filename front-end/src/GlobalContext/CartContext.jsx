@@ -33,10 +33,15 @@ const CartProvider = ({ children }) => {
   const itemRemove = (item) => {
     dispatch({ type: "REMOVE_SINGLE_ITEM", payload: item });
   };
+  const itemQuantityDecrease = (item) => {
+    dispatch({ type: "DECREASE_ITEM_QUANTITY", payload: item });
+  };
+  const itemQuantityIncrease = (item) => {
+    dispatch({ type: "INCREASE_ITEM_QUANTITY", payload: item });
+  };
 
   const handleRemoveAllSoldCart = (tableCode) => {
     dispatch({ type: "REMOVE_CART", payload: { tableCode } });
-    // console.log(fullCart, tableCode);
   };
 
   //add cart data inside local storage
@@ -51,6 +56,8 @@ const CartProvider = ({ children }) => {
         handleAddToBill,
         itemRemove,
         handleRemoveAllSoldCart,
+        itemQuantityIncrease,
+        itemQuantityDecrease,
       }}
     >
       {children}

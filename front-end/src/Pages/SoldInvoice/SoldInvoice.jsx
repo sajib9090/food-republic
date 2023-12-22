@@ -77,7 +77,9 @@ const SoldInvoice = () => {
         <p className="text-[8px] pl-2">
           Served by:{" "}
           <span className="capitalize">
-            {soldInvoice && soldInvoice?.served_by}
+            {soldInvoice && soldInvoice?.served_by
+              ? soldInvoice?.served_by
+              : "Anonymous"}
           </span>
         </p>
         <div className="mt-2 px-1">

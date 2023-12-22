@@ -34,6 +34,48 @@ const CartReducer = (state, action) => {
       };
     }
   }
+
+  if (action.type === "DECREASE_ITEM_QUANTITY") {
+    const { _id, table_name } = action.payload;
+
+    const existingCartItemIndex = state.carts.findIndex(
+      (cartItem) => cartItem._id === _id && cartItem.table_name === table_name
+    );
+
+    if (existingCartItemIndex !== -1) {
+      // If the item exists and quantity is greater than 1, update its quantity
+      const updatedCarts = [...state.carts];
+      if (updatedCarts[existingCartItemIndex].item_quantity > 1) {
+        updatedCarts[existingCartItemIndex].item_quantity -= 1;
+      }
+
+      return {
+        ...state,
+        carts: updatedCarts,
+      };
+    }
+  }
+
+  if (action.type === "INCREASE_ITEM_QUANTITY") {
+    const { _id, table_name } = action.payload;
+
+    const existingCartItemIndex = state.carts.findIndex(
+      (cartItem) => cartItem._id === _id && cartItem.table_name === table_name
+    );
+
+    if (existingCartItemIndex !== -1) {
+      // If the item exists with the matching table_name, update its quantity
+      const updatedCarts = [...state.carts];
+      updatedCarts[existingCartItemIndex].item_quantity += 1;
+
+      return {
+        ...state,
+        carts: updatedCarts,
+      };
+    }
+  }
+
+  //
   if (action.type === "REMOVE_SINGLE_ITEM") {
     let updatedCart = state?.carts?.filter(
       (currentItem) => currentItem?._id !== action?.payload?._id
