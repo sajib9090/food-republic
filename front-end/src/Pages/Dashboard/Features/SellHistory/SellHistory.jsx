@@ -234,6 +234,19 @@ const SellHistory = () => {
                             <CurrencyFormatter value={totalDiscountByMonth} />
                           </div>
                         </div>
+                        <div className="flex font-bold space-x-[25px] text-green-600">
+                          <div>Average Discount (%): </div>
+                          <div>
+                            {totalDiscountByMonth !== undefined &&
+                            totalDiscountByMonth !== null
+                              ? (
+                                  (totalDiscountByMonth /
+                                    (totalBillByMonth - totalDiscountByMonth)) *
+                                  100
+                                ).toFixed(2) + "%"
+                              : "N/A"}
+                          </div>
+                        </div>
                         <div className="flex font-bold space-x-[157px] text-blue-700">
                           <div>Net Sell: </div>
                           <div className="text-2xl font-extrabold">

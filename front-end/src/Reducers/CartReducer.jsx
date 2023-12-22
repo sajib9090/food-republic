@@ -77,9 +77,19 @@ const CartReducer = (state, action) => {
 
   //
   if (action.type === "REMOVE_SINGLE_ITEM") {
-    let updatedCart = state?.carts?.filter(
-      (currentItem) => currentItem?._id !== action?.payload?._id
-    );
+    const { table_name, _id } = action.payload;
+
+    let updatedCart = state?.carts
+      ?.map((cart) => {
+        if (cart?.table_name === table_name && cart?._id === _id) {
+          // Skip the item with the matching table_name and _id
+          return null;
+        } else {
+          return cart;
+        }
+      })
+      .filter(Boolean);
+
     return {
       ...state,
       carts: updatedCart,
