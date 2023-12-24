@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { RiLoader2Line } from "react-icons/ri";
 import CurrencyFormatter from "../../../../components/CurrencyFormatter/CurrencyFormatter";
-// import SellReportTable from "../../../../components/SellReportTable/SellReportTable";
 
 const SellHistory = () => {
   const [selectedMonth, setSelectedMonth] = useState("");
@@ -14,22 +13,6 @@ const SellHistory = () => {
   const [loading, setLoading] = useState(false);
   const [totalBillByMonth, setTotalBillByMonth] = useState({});
   const [totalDiscountByMonth, setTotalDiscountByMonth] = useState({});
-
-  // //for monthly sell record deletion
-  // const [hiddenPopup, setHiddenPopup] = useState(false);
-  // const [hiddenData, setHiddenData] = useState(false);
-  // const handleValidation = (e) => {
-  //   e.preventDefault();
-  //   const hidden_code = e.target.hiddenCode.value;
-  //   if (hidden_code == "Foodrepublic9090#") {
-  //     toast.success("Validation approved");
-  //     setHiddenData(true);
-  //   } else {
-  //     toast.error("Invalid code! Please try again.");
-  //     setHiddenData(false);
-  //   }
-  // };
-  // //end
 
   useEffect(() => {
     const calculateTotals = () => {
@@ -269,46 +252,19 @@ const SellHistory = () => {
         )}
       </>
       {/* <div>
-        <p
-          onClick={() => setHiddenPopup(!hiddenPopup)}
-          className="cursor-pointer text-red-800 underline mt-2 font-bold"
-        >
-          Warning! Permission needed.
-        </p>
-        {hiddenPopup ? (
-          <div>
-            <form onSubmit={handleValidation} className="flex items-center">
-              <input
-                className="h-[30px] w-[150px] border-2 border-t border-b border-l border-r-0 border-gray-300 rounded-l px-2"
-                type="text"
-                name="hiddenCode"
-                placeholder="Enter secret code"
-              />
-              <button
-                className="h-[30px] bg-green-600 text-white rounded-r w-[100px]"
-                type="submit"
-              >
-                Verify
-              </button>
-            </form>
-          </div>
-        ) : null}
-
-        {hiddenData ? (
-          <div>
-            {findDataByMonth?.map((item, index) => (
-              <SellReportTable
-                key={item._id}
-                index={index}
-                id={item._id}
-                tableName={item.table_name}
-                items={item.items}
-                totalBill={item.total_bill}
-                totalDiscount={item.total_discount}
-              />
-            ))}
-          </div>
-        ) : null}
+        <div>
+          {findDataByMonth?.map((item, index) => (
+            <SellReportTableForDelete
+              key={item._id}
+              index={index}
+              id={item._id}
+              tableName={item.table_name}
+              items={item.items}
+              totalBill={item.total_bill}
+              totalDiscount={item.total_discount}
+            />
+          ))}
+        </div>
       </div> */}
     </div>
   );

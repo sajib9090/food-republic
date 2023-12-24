@@ -2,8 +2,8 @@ import axios from "axios";
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import { RiLoader2Line } from "react-icons/ri";
-import CurrencyFormatter from "../../../../components/CurrencyFormatter/CurrencyFormatter";
 import DateFormatter from "../../../../components/DateFormatter/DateFormatter";
+import CurrencyFormatter from "../../../../components/CurrencyFormatter/CurrencyFormatter";
 
 const ExpenseHistory = () => {
   const [selectedDate, setSelectedDate] = useState(null);

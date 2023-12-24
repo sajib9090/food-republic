@@ -1,21 +1,21 @@
 import { NavLink, Outlet } from "react-router-dom";
 
 const Inventory = () => {
-  const menu = [
-    {
-      id: 1,
-      title: "Add Daily Expenses",
-      link: "add-daily-expenses",
-    },
-    {
-      id: 2,
-      title: "Find Expenses",
-      link: "find-expenses",
-    },
-  ];
+  // const menu = [
+  //   {
+  //     id: 1,
+  //     title: "Add Daily Expenses",
+  //     link: "add-daily-expenses",
+  //   },
+  //   {
+  //     id: 2,
+  //     title: "Find Expenses",
+  //     link: "find-expenses",
+  //   },
+  // ];
   return (
     <div>
-      <div className="h-[50px] w-full flex items-center justify-center border-b border-blue-200 space-x-4">
+      {/* <div className="h-[50px] w-full flex items-center justify-center border-b border-blue-200 space-x-4">
         {menu.map((item) => (
           <NavLink
             to={item.link}
@@ -29,7 +29,7 @@ const Inventory = () => {
             {item.title}
           </NavLink>
         ))}
-      </div>
+      </div> */}
       <div>
         <Outlet />
       </div>

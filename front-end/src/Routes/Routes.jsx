@@ -7,6 +7,7 @@ import Login from "../Pages/Login/Login";
 import PrivateRoute from "./PrivateRoute";
 import PrimaryLoader from "../components/PrimaryLoader/PrimaryLoader";
 import Error from "../Pages/Error/Error";
+import ExpenseReport from "../Pages/Dashboard/ExpenseReport/ExpenseReport";
 const Sell = lazy(() => import("../Pages/Sell/Sell"));
 const SelectOrders = lazy(() => import("../Pages/SelectOrders/SelectOrders"));
 const Dashboard = lazy(() => import("../Pages/Dashboard/Dashboard"));
@@ -36,16 +37,16 @@ const FindVoidInvoice = lazy(() =>
   import("../Pages/Dashboard/SellReport/FindVoidInvoice/FindVoidInvoice")
 );
 const AddDailyExpenses = lazy(() =>
-  import("../Pages/Dashboard/Inventory/AddDailyExpenses/AddDailyExpenses")
+  import("../Pages/Dashboard/ExpenseReport/AddDailyExpenses/AddDailyExpenses")
 );
 const FindExpenses = lazy(() =>
-  import("../Pages/Dashboard/Inventory/FindExpenses/FindExpenses")
+  import("../Pages/Dashboard/ExpenseReport/FindExpenses/FindExpenses")
 );
 const SellHistory = lazy(() =>
-  import("../Pages/Dashboard/Features/SellHistory/SellHistory")
+  import("../Pages/Dashboard/SellReport/SellHistory/SellHistory")
 );
 const ExpenseHistory = lazy(() =>
-  import("../Pages/Dashboard/Features/ExpenseHistory/ExpenseHistory")
+  import("../Pages/Dashboard/ExpenseReport/ExpenseHistory/ExpenseHistory")
 );
 const MaintainMembers = lazy(() =>
   import("../Pages/Dashboard/Features/MaintainMembers/MaintainMembers")
@@ -136,10 +137,10 @@ export const router = createBrowserRouter([
             ],
           },
           {
-            path: "inventory",
+            path: "expense-report",
             element: (
               <Suspense fallback={<PrimaryLoader />}>
-                <Inventory />
+                <ExpenseReport />
               </Suspense>
             ),
             children: [
@@ -159,6 +160,40 @@ export const router = createBrowserRouter([
                   </Suspense>
                 ),
               },
+              {
+                path: "expense-history",
+                element: (
+                  <Suspense fallback={<PrimaryLoader />}>
+                    <ExpenseHistory />
+                  </Suspense>
+                ),
+              },
+            ],
+          },
+          {
+            path: "inventory",
+            element: (
+              <Suspense fallback={<PrimaryLoader />}>
+                <Inventory />
+              </Suspense>
+            ),
+            children: [
+              // {
+              //   path: "add-daily-expenses",
+              //   element: (
+              //     <Suspense fallback={<PrimaryLoader />}>
+              //       <AddDailyExpenses />
+              //     </Suspense>
+              //   ),
+              // },
+              // {
+              //   path: "find-expenses",
+              //   element: (
+              //     <Suspense fallback={<PrimaryLoader />}>
+              //       <FindExpenses />
+              //     </Suspense>
+              //   ),
+              // },
             ],
           },
           {
@@ -182,6 +217,14 @@ export const router = createBrowserRouter([
                 element: (
                   <Suspense fallback={<PrimaryLoader />}>
                     <FindSellInvoice />
+                  </Suspense>
+                ),
+              },
+              {
+                path: "sell-history",
+                element: (
+                  <Suspense fallback={<PrimaryLoader />}>
+                    <SellHistory />
                   </Suspense>
                 ),
               },
@@ -225,22 +268,6 @@ export const router = createBrowserRouter([
                 element: (
                   <Suspense fallback={<PrimaryLoader />}>
                     <MaintainVoid />
-                  </Suspense>
-                ),
-              },
-              {
-                path: "sell-history",
-                element: (
-                  <Suspense fallback={<PrimaryLoader />}>
-                    <SellHistory />
-                  </Suspense>
-                ),
-              },
-              {
-                path: "expense-history",
-                element: (
-                  <Suspense fallback={<PrimaryLoader />}>
-                    <ExpenseHistory />
                   </Suspense>
                 ),
               },

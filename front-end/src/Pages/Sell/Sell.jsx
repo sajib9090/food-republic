@@ -10,6 +10,8 @@ const Sell = () => {
   const [loading, setLoading] = useState(false);
   const { carts } = useCartContext();
 
+  // console.log(carts);
+
   const uniqueTableNames =
     carts && carts?.length > 0
       ? [...new Set(carts?.map((item) => item?.table_name))]
@@ -46,9 +48,12 @@ const Sell = () => {
           <div className="grid grid-cols-4 gap-6">
             {tableData &&
               tableData?.map((table) => {
-                const staffNameForTable = carts?.find(
-                  (cart) => cart?.table_name === table?.name
-                )?.staffName;
+                const staffNamesForTable = carts
+                  ?.filter((cart) => cart?.table_name === table?.name)
+                  .map((cart) => cart?.staffName);
+
+                const lastStaffName =
+                  staffNamesForTable[staffNamesForTable.length - 1];
 
                 return (
                   <Link
@@ -64,11 +69,11 @@ const Sell = () => {
                     <h1 className="text-lg font-bold capitalize">
                       {table.name}
                     </h1>
-                    {staffNameForTable && (
+                    {lastStaffName && (
                       <p className="text-sm text-gray-600 capitalize mt-1">
                         Pending by{" "}
                         <span className="text-red-900 font-extrabold">
-                          {staffNameForTable}
+                          {lastStaffName}
                         </span>
                       </p>
                     )}
