@@ -43,6 +43,9 @@ async function run() {
 
     const MemberCollection = client.db("FoodRepublic").collection("members");
     const StaffCollection = client.db("FoodRepublic").collection("staff");
+    const OrderCollection = client
+      .db("FoodRepublic")
+      .collection("orderCollection");
     // API endpoint to get the list of tables from the collection
 
     app.get("/api/get-categories", async (req, res) => {
@@ -107,6 +110,85 @@ async function run() {
       } catch (error) {
         console.error("Database Insertion Error:", error);
         res.status(500).send("Error inserting data into the database");
+      }
+    });
+
+    app.get("/api/get-orders", async (req, res) => {
+      try {
+        const { id, table_code } = req.query;
+        let query = {};
+
+        if (id) {
+          // If ID is provided, find a specific order by ID
+          query._id = new ObjectId(id);
+        }
+
+        if (table_code) {
+          // If table_code is provided, filter by table_code
+          query.table_code = table_code;
+        }
+
+        const orders = await OrderCollection.find(query).toArray();
+
+        if (orders.length === 0) {
+          return res.status(404).json({ message: "No orders found" });
+        }
+
+        res.json({
+          message: "Orders retrieved successfully",
+          orders,
+        });
+      } catch (error) {
+        console.error("Database Retrieval Error:", error);
+        res.status(500).send("Error retrieving data from the database");
+      }
+    });
+
+    app.post("/api/add-order-staff", async (req, res) => {
+      const { staff_name, table_code } = req.body;
+
+      try {
+        const newItem = {
+          staff_name,
+          table_code,
+          createdDate: new Date(),
+        };
+
+        const result = await OrderCollection.insertOne(newItem);
+        res.json({
+          message: "Item added successfully",
+          result,
+        });
+      } catch (error) {
+        console.error("Database Insertion Error:", error);
+        res.status(500).send("Error inserting data into the database");
+      }
+    });
+
+    app.delete("/api/delete-order", async (req, res) => {
+      try {
+        const { table_code } = req.query;
+
+        if (!table_code) {
+          return res
+            .status(400)
+            .json({ message: "Table code is required for deletion" });
+        }
+
+        const result = await OrderCollection.deleteMany({ table_code });
+
+        if (result.deletedCount === 0) {
+          return res
+            .status(404)
+            .json({ message: "No orders found for the specified table_code" });
+        }
+
+        res.json({
+          message: `Successfully deleted ${result.deletedCount} order(s) with table_code: ${table_code}`,
+        });
+      } catch (error) {
+        console.error("Database Deletion Error:", error);
+        res.status(500).send("Error deleting data from the database");
       }
     });
     // ObjectId
@@ -548,6 +630,37 @@ async function run() {
         res.status(500).send("Error inserting data into the database");
       }
     });
+
+    // app.delete("/api/delete-sold-invoice", async (req, res) => {
+    //   const { _id } = req.query;
+
+    //   try {
+    //     if (!_id) {
+    //       return res
+    //         .status(400)
+    //         .json({ message: "_id is required for deletion" });
+    //     }
+
+    //     // Convert the string _id to ObjectId
+    //     const objectId = new ObjectId(_id);
+
+    //     // Delete the document based on _id
+    //     const result = await SoldItemsCollection.deleteOne({ _id: objectId });
+
+    //     if (result.deletedCount === 0) {
+    //       return res
+    //         .status(404)
+    //         .json({ message: "No document found for the specified _id" });
+    //     }
+
+    //     res.json({
+    //       message: `Successfully deleted document with _id: ${_id}`,
+    //     });
+    //   } catch (error) {
+    //     console.error("Database Deletion Error:", error);
+    //     res.status(500).send("Error deleting data from the database");
+    //   }
+    // });
 
     //this api can serve data by the help of id, date, start date, end date, sold-invoice_id and also table_name
     app.get("/api/get-void-invoices", async (req, res) => {
