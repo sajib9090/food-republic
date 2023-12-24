@@ -92,8 +92,8 @@ const MaintainMembers = () => {
   }, [allMember]);
   return (
     <div className="flex w-full gap-4">
-      <div className="w-[50%] min-h-screen shadow-md px-4">
-        <h1 className="text-lg font-bold mb-2">Members List</h1>
+      <div className="w-[60%] mx-auto min-h-screen shadow-md px-4">
+        <h1 className="text-lg font-bold mb-2 mt-6">Members List</h1>
         {memberLoading ? (
           <div className="text-center mt-4 text-base">Please wait...</div>
         ) : (
@@ -158,27 +158,7 @@ const MaintainMembers = () => {
           </div>
         )}
       </div>
-      <div className="w-[50%] min-h-screen shadow-md px-4">
-        {/* <h1 className="text-lg font-bold">Search Member</h1>
-        <div>
-          <input
-            type="text"
-            value={searchField}
-            onChange={(e) => setSearchField(e.target.value)}
-            placeholder="Mobile number or Name"
-            className="h-[35px] w-[250px] px-2 border-2 border-gray-300 rounded-l"
-          />
-          <button
-            onClick={handleSearch}
-            className="h-[35px] w-[100px] px-2 bg-blue-600 text-white rounded-r"
-          >
-            Search
-          </button>
-        </div>
-        <div>
-          <div></div>
-        </div> */}
-      </div>
+
       <Transition appear show={isOpen} as={Fragment}>
         <Dialog
           as="div"

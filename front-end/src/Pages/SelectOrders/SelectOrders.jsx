@@ -15,6 +15,7 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { RiLoader2Line } from "react-icons/ri";
 import { CiCircleRemove } from "react-icons/ci";
+import { FiLoader } from "react-icons/fi";
 
 const SelectOrders = () => {
   const { name } = useParams();
@@ -55,7 +56,7 @@ const SelectOrders = () => {
   const [selectedStaff, setSelectedStaff] = useState("");
   const [triggerEffect, setTriggerEffect] = useState(false);
   const [staffValidation, setStaffValidation] = useState("");
-
+  const [staffLoading, setStaffLoading] = useState(false);
   const [staff, setStaff] = useState({});
   const [isStaffSelected, setIsStaffSelected] = useState(false);
 
@@ -65,6 +66,7 @@ const SelectOrders = () => {
 
   const handleButtonClick = () => {
     if (selectedStaff && name) {
+      setStaffLoading(true);
       const data = {
         staff_name: selectedStaff,
         table_code: name,
@@ -82,6 +84,9 @@ const SelectOrders = () => {
           if (err) {
             toast.error("Something went wrong!", { autoClose: 100 });
           }
+        })
+        .finally(() => {
+          setStaffLoading(false);
         });
     } else {
       toast.error("Please select a Staff", { autoClose: 100 });
@@ -273,6 +278,26 @@ const SelectOrders = () => {
                     if (response) {
                       handleRemoveAllSoldCart(tableName);
                       navigate(`${res.data.insertedId}`);
+
+                      axios
+                        .delete(
+                          `${
+                            import.meta.env.VITE_API_URL
+                          }/api/delete-order?table_code=${name}`
+                        )
+                        .then((res) => {
+                          if (res) {
+                            setTriggerEffect(!triggerEffect);
+                            setIsStaffSelected(false);
+                          }
+                        })
+                        .catch((err) => {
+                          if (err) {
+                            toast.error("Something went wrong", {
+                              autoClose: 100,
+                            });
+                          }
+                        });
                     }
                   })
                   .catch((err) => {
@@ -281,6 +306,23 @@ const SelectOrders = () => {
               } else {
                 handleRemoveAllSoldCart(tableName);
                 navigate(`${res.data.insertedId}`);
+                axios
+                  .delete(
+                    `${
+                      import.meta.env.VITE_API_URL
+                    }/api/delete-order?table_code=${name}`
+                  )
+                  .then((res) => {
+                    if (res) {
+                      setTriggerEffect(!triggerEffect);
+                      setIsStaffSelected(false);
+                    }
+                  })
+                  .catch((err) => {
+                    if (err) {
+                      toast.error("Something went wrong", { autoClose: 100 });
+                    }
+                  });
               }
             }
           })
@@ -330,10 +372,14 @@ const SelectOrders = () => {
               ))}
             </select>
             <button
-              className="h-[40px] w-[100px] bg-blue-500 text-white rounded-r"
+              className="h-[40px] w-[100px] bg-blue-500 text-white rounded-r flex items-center justify-center"
               onClick={handleButtonClick}
+              disabled={staffLoading}
             >
-              Select
+              Select{" "}
+              {staffLoading ? (
+                <FiLoader className="w-6 h-6 animate-spin text-white font-bold" />
+              ) : null}
             </button>
           </div>
         ) : (

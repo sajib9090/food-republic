@@ -129,97 +129,116 @@ const SellHistory = () => {
               {allItemNames ? (
                 <>
                   {allItemNames?.length > 0 && (
-                    <table className="mt-4 border-collapse border border-gray-300">
-                      <thead>
-                        <tr>
-                          <th className="border border-gray-300 p-2"></th>
-                          {[...Array(totalDaysInMonth).keys()].map((day) => (
-                            <th
-                              key={day + 1}
-                              className="border border-gray-300 p-2 text-center font-bold bg-blue-100"
-                            >
-                              {day + 1}
-                            </th>
-                          ))}
-                          <th className="border border-gray-300 p-2 text-center bg-blue-200">
-                            Total
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {sellData &&
-                          sellData?.map((sellDataRow, index) => (
-                            <tr key={sellDataRow.itemName}>
-                              <td className="border border-gray-300 p-2 bg-green-200 font-bold capitalize">
-                                <span className="mr-1">{index + 1}.</span>
-                                {sellDataRow.itemName}
-                              </td>
-                              {sellDataRow?.sellQuantities?.map(
-                                (sellQuantity, index) => (
-                                  <td
-                                    key={index + 1}
-                                    className="border border-gray-300 p-3 bg-slate-100"
-                                  >
-                                    {sellQuantity == 0 ? "-" : sellQuantity}
-                                  </td>
-                                )
-                              )}
-                              <td className="border border-gray-300 p-2 font-bold bg-purple-300">
-                                {sellDataRow.sellQuantities.reduce(
-                                  (sum, qty) => sum + qty,
-                                  0
-                                )}
-                              </td>
-                            </tr>
-                          ))}
-
-                        {/* Add a row for the totals */}
-                        <tr>
-                          <td className="border border-gray-300 p-2 font-bold bg-blue-200">
-                            Daily Sell Quantity
-                          </td>
-                          {sellData &&
-                            sellData[0]?.sellQuantities?.map((_, index) => (
-                              <td
-                                key={index + 1}
-                                className="border border-gray-300 p-3 font-bold bg-blue-200"
+                    <>
+                      <table className="mt-4 border-collapse border border-gray-300">
+                        <thead>
+                          <tr>
+                            <th className="border border-gray-300 p-2"></th>
+                            {[...Array(totalDaysInMonth).keys()].map((day) => (
+                              <th
+                                key={day + 1}
+                                className="border border-gray-300 p-2 text-center font-bold bg-blue-100"
                               >
-                                {sellData.reduce(
-                                  (sum, sellDataRow) =>
-                                    sum + sellDataRow.sellQuantities[index],
-                                  0
-                                )}
-                              </td>
+                                {day + 1}
+                              </th>
                             ))}
-                          <td className="border border-gray-300 p-2 font-bold bg-blue-300">
-                            {sellData.reduce(
-                              (sum, sellDataRow) =>
-                                sum +
-                                sellDataRow.sellQuantities.reduce(
-                                  (qtySum, qty) => qtySum + qty,
-                                  0
-                                ),
-                              0
-                            )}
-                          </td>
-                        </tr>
-                      </tbody>
-                      <div className="space-y-2 mt-4 mb-2 ml-2 text-xl">
-                        <div className="flex font-bold space-x-36">
-                          <div>Total Sell: </div>
-                          <div>
+                            <th className="border border-gray-300 p-2 text-center bg-blue-200">
+                              Total
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {sellData &&
+                            sellData?.map((sellDataRow, index) => (
+                              <tr key={sellDataRow.itemName}>
+                                <td className="border border-gray-300 p-2 bg-green-200 font-bold capitalize">
+                                  <span className="mr-1">{index + 1}.</span>
+                                  {sellDataRow.itemName}
+                                </td>
+                                {sellDataRow?.sellQuantities?.map(
+                                  (sellQuantity, index) => (
+                                    <td
+                                      key={index + 1}
+                                      className="border border-gray-300 p-3 bg-slate-100"
+                                    >
+                                      {sellQuantity == 0 ? "-" : sellQuantity}
+                                    </td>
+                                  )
+                                )}
+                                <td className="border border-gray-300 p-2 font-bold bg-purple-300">
+                                  {sellDataRow.sellQuantities.reduce(
+                                    (sum, qty) => sum + qty,
+                                    0
+                                  )}
+                                </td>
+                              </tr>
+                            ))}
+
+                          {/* Add a row for the totals */}
+                          <tr>
+                            <td className="border border-gray-300 p-2 font-bold bg-blue-200">
+                              Daily Sell Quantity
+                            </td>
+                            {sellData &&
+                              sellData[0]?.sellQuantities?.map((_, index) => (
+                                <td
+                                  key={index + 1}
+                                  className="border border-gray-300 p-3 font-bold bg-blue-200"
+                                >
+                                  {sellData.reduce(
+                                    (sum, sellDataRow) =>
+                                      sum + sellDataRow.sellQuantities[index],
+                                    0
+                                  )}
+                                </td>
+                              ))}
+                            <td className="border border-gray-300 p-2 font-bold bg-blue-300">
+                              {sellData.reduce(
+                                (sum, sellDataRow) =>
+                                  sum +
+                                  sellDataRow.sellQuantities.reduce(
+                                    (qtySum, qty) => qtySum + qty,
+                                    0
+                                  ),
+                                0
+                              )}
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                      <div className="space-y-2 mt-4 mb-2 ml-2 text-xl w-[600px] flex flex-col">
+                        <div className="flex items-center font-bold w-full">
+                          <div className="w-[70%] text-left">Total Sell: </div>
+                          <div className="w-[30%] text-left">
                             <CurrencyFormatter value={totalBillByMonth} />
                           </div>
                         </div>
-                        <div className="flex font-bold space-x-[95px] text-red-600">
-                          <div>Total Discount: </div>
-                          <div>
+                        <hr />
+                        <div className="flex items-center font-bold text-yellow-700 w-full">
+                          <div className="w-[70%] text-left">
+                            Average Daily Sell:{" "}
+                          </div>
+                          <div className="w-[30%] text-left">
+                            <CurrencyFormatter
+                              value={totalBillByMonth / totalDaysInMonth}
+                            />
+                          </div>
+                        </div>
+                        <hr />
+                        <div className="flex items-center w-full font-bold text-red-600">
+                          <div className="w-[70%] text-left">
+                            Total Discount:{" "}
+                          </div>
+                          <div className="w-[30%] text-left">
                             <CurrencyFormatter value={totalDiscountByMonth} />
                           </div>
                         </div>
-                        <div className="flex font-bold space-x-[25px] text-green-600">
-                          <div>Average Discount (%): </div>
-                          <div>
+                        <hr />
+                        <div className="flex items-center font-bold text-green-600">
+                          <div className="w-[70%] text-left">
+                            Average Discount (%):{" "}
+                          </div>
+                          <div className="w-[30%] text-left">
                             {totalDiscountByMonth !== undefined &&
                             totalDiscountByMonth !== null
                               ? (
@@ -230,16 +249,35 @@ const SellHistory = () => {
                               : "N/A"}
                           </div>
                         </div>
-                        <div className="flex font-bold space-x-[157px] text-blue-700">
-                          <div>Net Sell: </div>
-                          <div className="text-2xl font-extrabold">
+                        {/* <hr />
+                        <div className="flex items-center font-bold text-rose-400">
+                          <div className="w-[70%] text-left">
+                            Minimum Sell a Day:{" "}
+                          </div>
+                          <div className="w-[30%] text-left">
+                            <CurrencyFormatter value={"0000"} />
+                          </div>
+                        </div>
+                        <hr />
+                        <div className="flex items-center font-bold text-fuchsia-500">
+                          <div className="w-[70%] text-left">
+                            Maximum Sell a Day:{" "}
+                          </div>
+                          <div className="w-[30%] text-left">
+                            <CurrencyFormatter value={"0000"} />
+                          </div>
+                        </div> */}
+                        <hr />
+                        <div className="flex items-center font-bold text-blue-700">
+                          <div className="w-[70%] text-left">Net Sell: </div>
+                          <div className="text-2xl font-extrabold w-[30%] text-left">
                             <CurrencyFormatter
                               value={totalBillByMonth - totalDiscountByMonth}
                             />
                           </div>
                         </div>
                       </div>
-                    </table>
+                    </>
                   )}
                 </>
               ) : (
