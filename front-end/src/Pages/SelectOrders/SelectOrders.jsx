@@ -439,14 +439,14 @@ const SelectOrders = () => {
                     onClick={() => {
                       handleCart(item, name, staffValidation);
                     }}
-                    className="flex justify-between items-center shadow-md mt-4 pb-2 px-2 border-b border-gray-300 cursor-pointer"
+                    className="flex justify-between items-center py-4 shadow-md px-2 border-b border-gray-300 cursor-pointer hover:shadow-md hover:bg-gray-200 hover:text-red-700"
                   >
-                    <div className="flex font-bold text-black text-lg">
+                    <div className="flex font-bold text-black hover:text-red-700 text-lg">
                       <div>
                         <p className="mr-1">{i + 1}.</p>
                       </div>
                       <div>
-                        <p className="wrapped-text capitalize">
+                        <p className="wrapped-text capitalize hover:text-red-700">
                           <HyphenToSpaceConverter
                             inputString={item?.item_name}
                           />

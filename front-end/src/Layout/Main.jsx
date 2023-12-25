@@ -129,7 +129,15 @@ const Main = () => {
           </Menu>
         </Sider>
         <Layout>
-          <Header style={{ padding: 0, background: colorBgContainer }}>
+          <Header
+            style={{
+              padding: 0,
+              background: colorBgContainer,
+              display: "flex",
+              justifyContent: "space-between",
+              paddingRight: "1.2%",
+            }}
+          >
             <Button
               type="text"
               icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
@@ -140,6 +148,12 @@ const Main = () => {
                 height: 64,
               }}
             />
+            <span>
+              Hi,{" "}
+              <span className="font-bold capitalize">
+                {user?.email?.split("@")[0]}
+              </span>
+            </span>
           </Header>
           <Content
             style={{

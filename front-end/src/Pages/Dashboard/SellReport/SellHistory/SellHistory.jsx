@@ -297,13 +297,16 @@ const SellHistory = () => {
                         </div>
                         <hr />
                         <div className="flex items-center font-bold text-blue-700">
-                          <div className="w-[70%] text-left">Net Sell: </div>
-                          <div className="text-2xl font-extrabold w-[30%] text-left">
+                          <div className="w-[70%] text-left text-[25px]">
+                            Net Sell:{" "}
+                          </div>
+                          <div className="text-[28px] font-extrabold w-[30%] text-left">
                             <CurrencyFormatter
                               value={totalBillByMonth - totalDiscountByMonth}
                             />
                           </div>
                         </div>
+                        <hr />
                       </div>
 
                       <div className="mb-8 mt-16">
