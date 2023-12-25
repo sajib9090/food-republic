@@ -313,49 +313,40 @@ const SellHistory = () => {
                         <h1 className="text-center text-xl mt-8 mb-2 text-blue-600">
                           Details Sell Report day by day
                         </h1>
+                        <p className="text-center">{selectedMonth}</p>
                         {/* Table */}
                         <table className="border-collapse w-full">
-                          <tr>
-                            <th className="border border-gray-100 p-2 bg-slate-400">
-                              Date
+                          <tr className="w-full">
+                            <th className="border border-gray-200 p-4 bg-slate-500 text-white w-[20%]">
+                              Day
                             </th>
-
-                            {detailsData?.dailyTotals?.map((item) => (
-                              <th
-                                className="border border-gray-100 p-2 bg-slate-300"
-                                key={item._id}
-                              >
-                                {item._id}
-                              </th>
-                            ))}
+                            <th className="border border-gray-200 p-4 bg-slate-500 text-white w-[50%]">
+                              Daily Sell
+                            </th>
+                            <th className="border border-gray-200 p-4 bg-slate-500 text-white w-[30%]">
+                              Daily Discount
+                            </th>
                           </tr>
-                          <tr>
-                            <td className="border border-gray-100 text-center p-2 bg-blue-400">
-                              Sell
-                            </td>
-
-                            {detailsData?.dailyTotals?.map((item) => (
-                              <td
-                                className="border border-gray-100 text-center p-2 bg-blue-300"
-                                key={item._id}
-                              >
-                                {item.total_bill}
+                          {detailsData?.dailyTotals?.map((item, index) => (
+                            <tr
+                              key={item._id}
+                              className={
+                                index % 2 == 0 ? "bg-blue-200" : "bg-gray-200"
+                              }
+                            >
+                              <td className="border border-gray-300 text-center p-4 text-black">
+                                {selectedMonth}-{item._id}
                               </td>
-                            ))}
-                          </tr>
-                          <tr>
-                            <td className="border border-gray-100 text-center p-2 bg-orange-400">
-                              Discount
-                            </td>
-                            {detailsData?.dailyTotals?.map((item) => (
-                              <td
-                                className="border border-gray-100 text-center p-2 bg-orange-300"
-                                key={item._id}
-                              >
-                                {item.total_discount}
+                              <td className="border border-gray-300 text-center p-4 text-black">
+                                <CurrencyFormatter value={item.total_bill} />
                               </td>
-                            ))}
-                          </tr>
+                              <td className="border border-gray-300 text-center p-4 text-black">
+                                <CurrencyFormatter
+                                  value={item.total_discount}
+                                />
+                              </td>
+                            </tr>
+                          ))}
                         </table>
                       </div>
                     </>
