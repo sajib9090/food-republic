@@ -14,6 +14,8 @@ const SellHistory = () => {
   const [totalBillByMonth, setTotalBillByMonth] = useState({});
   const [totalDiscountByMonth, setTotalDiscountByMonth] = useState({});
 
+  const [detailsData, setDetailsData] = useState({});
+  console.log(detailsData);
   useEffect(() => {
     const calculateTotals = () => {
       const totalBillResult = findDataByMonth?.reduce((acc, item) => {
@@ -45,13 +47,29 @@ const SellHistory = () => {
           }/api/get-sold-invoices?month=${selectedMonth}`
         )
         .then((res) => {
-          setFindDataByMonth(res.data.soldInvoices);
+          if (res) {
+            setFindDataByMonth(res.data.soldInvoices);
+            axios
+              .get(
+                `${
+                  import.meta.env.VITE_API_URL
+                }/api/get-sold-invoices-by-month-details?month=${selectedMonth}`
+              )
+              .then((response) => {
+                setDetailsData(response.data);
+              })
+              .catch((error) => {
+                console.log(error);
+              })
+              .finally(() => {
+                setLoading(false);
+              });
+          }
         })
         .catch((err) => {
-          console.log(err);
-        })
-        .finally(() => {
-          setLoading(false);
+          if (err) {
+            toast.error("Something went wrong");
+          }
         });
     } else {
       toast.error("Select a month first");
@@ -249,24 +267,34 @@ const SellHistory = () => {
                               : "N/A"}
                           </div>
                         </div>
-                        {/* <hr />
-                        <div className="flex items-center font-bold text-rose-400">
-                          <div className="w-[70%] text-left">
-                            Minimum Sell a Day:{" "}
+                        <hr />
+                        <div className="flex items-center font-bold text-orange-500">
+                          <div className="w-[70%] text-left flex items-center">
+                            Minimum Sell Day:
+                            <div className="ml-2 text-gray-500 text-base">
+                              <span>
+                                ({selectedMonth}-{detailsData?.minTotalDate})
+                              </span>
+                            </div>
                           </div>
                           <div className="w-[30%] text-left">
-                            <CurrencyFormatter value={"0000"} />
+                            <CurrencyFormatter value={detailsData?.minTotal} />
                           </div>
                         </div>
                         <hr />
                         <div className="flex items-center font-bold text-fuchsia-500">
-                          <div className="w-[70%] text-left">
-                            Maximum Sell a Day:{" "}
+                          <div className="w-[70%] text-left flex items-center">
+                            Maximum Sell Day:
+                            <div className="ml-2 text-gray-500 text-base">
+                              <span>
+                                ({selectedMonth}-{detailsData?.maxTotalDate})
+                              </span>
+                            </div>
                           </div>
                           <div className="w-[30%] text-left">
-                            <CurrencyFormatter value={"0000"} />
+                            <CurrencyFormatter value={detailsData?.maxTotal} />
                           </div>
-                        </div> */}
+                        </div>
                         <hr />
                         <div className="flex items-center font-bold text-blue-700">
                           <div className="w-[70%] text-left">Net Sell: </div>
@@ -276,6 +304,56 @@ const SellHistory = () => {
                             />
                           </div>
                         </div>
+                      </div>
+
+                      <div className="mb-8 mt-16">
+                        <h1 className="text-center text-xl mt-8 mb-2 text-blue-600">
+                          Details Sell Report day by day
+                        </h1>
+                        {/* Table */}
+                        <table className="border-collapse w-full">
+                          <tr>
+                            <th className="border border-gray-100 p-2 bg-slate-400">
+                              Date
+                            </th>
+
+                            {detailsData?.dailyTotals?.map((item) => (
+                              <th
+                                className="border border-gray-100 p-2 bg-slate-300"
+                                key={item._id}
+                              >
+                                {item._id}
+                              </th>
+                            ))}
+                          </tr>
+                          <tr>
+                            <td className="border border-gray-100 text-center p-2 bg-blue-400">
+                              Sell
+                            </td>
+
+                            {detailsData?.dailyTotals?.map((item) => (
+                              <td
+                                className="border border-gray-100 text-center p-2 bg-blue-300"
+                                key={item._id}
+                              >
+                                {item.total_bill}
+                              </td>
+                            ))}
+                          </tr>
+                          <tr>
+                            <td className="border border-gray-100 text-center p-2 bg-orange-400">
+                              Discount
+                            </td>
+                            {detailsData?.dailyTotals?.map((item) => (
+                              <td
+                                className="border border-gray-100 text-center p-2 bg-orange-300"
+                                key={item._id}
+                              >
+                                {item.total_discount}
+                              </td>
+                            ))}
+                          </tr>
+                        </table>
                       </div>
                     </>
                   )}
