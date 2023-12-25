@@ -46,6 +46,7 @@ async function run() {
     const OrderCollection = client
       .db("FoodRepublic")
       .collection("orderCollection");
+
     // API endpoint to get the list of tables from the collection
 
     app.get("/api/get-categories", async (req, res) => {
@@ -551,6 +552,81 @@ async function run() {
         res
           .status(500)
           .send("Error retrieving sold invoices from the database");
+      }
+    });
+    app.get("/api/get-sold-invoices-by-month-details", async (req, res) => {
+      const month = req.query.month;
+
+      try {
+        if (!month) {
+          return res
+            .status(400)
+            .json({ message: "Month parameter is required" });
+        }
+
+        const startOfMonth = new Date(month);
+        startOfMonth.setDate(1);
+        startOfMonth.setHours(0, 0, 0, 0);
+
+        const endOfMonth = new Date(month);
+        endOfMonth.setMonth(endOfMonth.getMonth() + 1);
+        endOfMonth.setDate(0);
+        endOfMonth.setHours(23, 59, 59, 999);
+
+        const query = { createdDate: { $gte: startOfMonth, $lte: endOfMonth } };
+
+        // Calculate total_bill and total_discount for each day in the specified month
+        const aggregatePipeline = [
+          { $match: query },
+          {
+            $group: {
+              _id: { $dayOfMonth: "$createdDate" },
+              total_bill: { $sum: "$total_bill" },
+              total_discount: { $sum: "$total_discount" },
+            },
+          },
+          {
+            $sort: { _id: 1 },
+          },
+        ];
+
+        const dailyTotals = await SoldItemsCollection.aggregate(
+          aggregatePipeline
+        ).toArray();
+
+        // Find the date with the highest total_bill
+        let maxTotal = 0;
+        let maxTotalDate;
+
+        // Find the date with the lowest total_bill
+        let minTotal = Infinity;
+        let minTotalDate;
+
+        dailyTotals.forEach((dailyTotal) => {
+          if (dailyTotal.total_bill > maxTotal) {
+            maxTotal = dailyTotal.total_bill;
+            maxTotalDate = dailyTotal._id;
+          }
+
+          if (dailyTotal.total_bill < minTotal) {
+            minTotal = dailyTotal.total_bill;
+            minTotalDate = dailyTotal._id;
+          }
+        });
+
+        return res.json({
+          message: "Sold invoices by month retrieved successfully",
+          dailyTotals,
+          maxTotalDate,
+          maxTotal,
+          minTotalDate,
+          minTotal,
+        });
+      } catch (error) {
+        console.error("Database Retrieval Error:", error);
+        res
+          .status(500)
+          .send("Error retrieving sold invoices by month from the database");
       }
     });
 
