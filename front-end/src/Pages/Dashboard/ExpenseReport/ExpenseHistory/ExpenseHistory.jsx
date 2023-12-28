@@ -2,7 +2,6 @@ import axios from "axios";
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import { RiLoader2Line } from "react-icons/ri";
-import DateFormatter from "../../../../components/DateFormatter/DateFormatter";
 import CurrencyFormatter from "../../../../components/CurrencyFormatter/CurrencyFormatter";
 
 const ExpenseHistory = () => {
@@ -13,8 +12,8 @@ const ExpenseHistory = () => {
 
   useEffect(() => {
     // Update totalExpense whenever findDataByMonth changes
-    const sum = findDataByMonth.reduce(
-      (acc, item) => acc + item.expense_price,
+    const sum = findDataByMonth?.reduce(
+      (acc, item) => acc + item?.totalExpenses,
       0
     );
     setTotalExpense(sum);
@@ -28,10 +27,10 @@ const ExpenseHistory = () => {
         .get(
           `${
             import.meta.env.VITE_API_URL
-          }/api/get-expenses?month=${selectedDate}`
+          }/api/get-expenses-by-month?month=${selectedDate}`
         )
         .then((res) => {
-          setFindDataByMonth(res.data.expenses);
+          setFindDataByMonth(res.data.result);
         })
         .catch((err) => {
           if (err) {
@@ -76,39 +75,55 @@ const ExpenseHistory = () => {
         <>
           {findDataByMonth && findDataByMonth?.length > 0 ? (
             <>
-              <div className="mt-4 mx-auto grid grid-cols-3 gap-2">
-                {findDataByMonth &&
-                  findDataByMonth
-                    .sort(
-                      (a, b) =>
-                        new Date(a.createdDate) - new Date(b.createdDate)
-                    )
-                    .map((item, index) => (
-                      <div
-                        key={item._id}
-                        className="min-h-[40px] border-b border-r border-l border-gray-300 flex items-center justify-between px-2"
-                      >
-                        <div className="flex items-center text-xs">
-                          <p>{index + 1}.</p>
-                          <p className="wrapped-text">{item.title}</p>
-                        </div>
-                        <div className="flex items-center text-xs">
-                          <div>
-                            <p>{item.creator}</p>
-                            <div className="text-[8px] text-gray-400">
-                              <DateFormatter dateString={item.createdDate} />
+              <div className="mt-12">
+                <table className="border-collapse w-full">
+                  <thead>
+                    <tr className="bg-blue-100">
+                      <th className="w-[15%] border border-gray-400 p-[8px]">
+                        Date
+                      </th>
+                      <th className="w-[70%] border border-gray-400 p-[8px]">
+                        Details
+                      </th>
+                      <th className="w-[15%] border border-gray-400 p-[8px]">
+                        Amount
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {findDataByMonth?.map((data) => (
+                      <tr key={data?._id}>
+                        <td className="text-center bg-purple-50 font-bold text-lg border border-gray-400 p-[8px]">
+                          {data?._id}
+                        </td>
+                        <td className="border border-gray-400 p-[8px]">
+                          {data?.expenses?.map((expense, index) => (
+                            <div
+                              key={expense?._id}
+                              className={`capitalize flex items-center justify-between py-2 px-8 bg-slate-200 ${
+                                index === data?.expenses.length - 1
+                                  ? ""
+                                  : "border-b border-gray-300"
+                              }`}
+                            >
+                              <p>{expense.title}</p>
+                              <div>
+                                {expense.expense_price} <span>tk.</span>
+                              </div>
                             </div>
-                          </div>
-                          <div className="ml-4">
-                            <CurrencyFormatter value={item.expense_price} />
-                          </div>
-                        </div>
-                      </div>
+                          ))}
+                        </td>
+                        <td className="text-center bg-red-100 text-xl font-bold border border-gray-400 p-[8px]">
+                          <CurrencyFormatter value={data.totalExpenses} />
+                        </td>
+                      </tr>
                     ))}
+                  </tbody>
+                </table>
               </div>
 
               <div>
-                <div className="flex mt-2 font-extrabold">
+                <div className="flex justify-end text-2xl mt-2 font-extrabold">
                   Total Expense:{" "}
                   <span className="ml-4">
                     <CurrencyFormatter value={totalExpense} />

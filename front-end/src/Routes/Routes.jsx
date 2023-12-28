@@ -63,6 +63,9 @@ const AddStaff = lazy(() =>
 const StaffSellRecord = lazy(() =>
   import("../Pages/Dashboard/StaffRecord/StaffSellRecord/StaffSellRecord")
 );
+const Supplier = lazy(() =>
+  import("../Pages/Dashboard/Inventory/Supplier/Supplier")
+);
 
 export const router = createBrowserRouter([
   {
@@ -178,22 +181,14 @@ export const router = createBrowserRouter([
               </Suspense>
             ),
             children: [
-              // {
-              //   path: "add-daily-expenses",
-              //   element: (
-              //     <Suspense fallback={<PrimaryLoader />}>
-              //       <AddDailyExpenses />
-              //     </Suspense>
-              //   ),
-              // },
-              // {
-              //   path: "find-expenses",
-              //   element: (
-              //     <Suspense fallback={<PrimaryLoader />}>
-              //       <FindExpenses />
-              //     </Suspense>
-              //   ),
-              // },
+              {
+                path: "supplier",
+                element: (
+                  <Suspense fallback={<PrimaryLoader />}>
+                    <Supplier />
+                  </Suspense>
+                ),
+              },
             ],
           },
           {

@@ -15,7 +15,7 @@ const SellHistory = () => {
   const [totalDiscountByMonth, setTotalDiscountByMonth] = useState({});
 
   const [detailsData, setDetailsData] = useState({});
-  console.log(detailsData);
+  // console.log(detailsData);
   useEffect(() => {
     const calculateTotals = () => {
       const totalBillResult = findDataByMonth?.reduce((acc, item) => {
