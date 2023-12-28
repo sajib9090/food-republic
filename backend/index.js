@@ -903,6 +903,54 @@ async function run() {
       }
     });
 
+    app.get("/api/get-expenses-by-month", async (req, res) => {
+      try {
+        // Check if date, month, and sortByTitle parameters are provided in the query
+        const { month } = req.query;
+
+        let query = {};
+
+        if (month) {
+          // If month parameter is provided, add it to the query
+          const startOfMonth = new Date(`${month}-01T00:00:00.000Z`);
+          const endOfMonth = new Date(
+            new Date(startOfMonth).setMonth(startOfMonth.getMonth() + 1) - 1
+          );
+
+          query.createdDate = {
+            $gte: startOfMonth,
+            $lt: endOfMonth,
+          };
+        }
+
+        let pipeline = [
+          { $match: query },
+          { $sort: { createdDate: 1 } }, // Sort by createdDate in ascending order
+          {
+            $group: {
+              _id: {
+                $dateToString: { format: "%Y-%m-%d", date: "$createdDate" },
+              },
+              expenses: { $push: "$$ROOT" },
+              totalExpenses: { $sum: "$expense_price" }, // Use the correct field name here
+            },
+          },
+          { $sort: { _id: 1 } }, // Sort the result by date in ascending order
+        ];
+
+        // Execute the aggregation pipeline
+        let result = await ExpensesCollection.aggregate(pipeline).toArray();
+
+        res.json({
+          message: `Expenses retrieved successfully`,
+          result,
+        });
+      } catch (error) {
+        console.error("Database Query Error:", error);
+        res.status(500).send("Error fetching expenses from the database");
+      }
+    });
+
     app.post("/api/post-expense", async (req, res) => {
       const { title, expense_price, creator } = req.body;
       const createdDate = new Date();
