@@ -297,7 +297,7 @@ async function run() {
     });
 
     app.post("/api/add-menu-item", async (req, res) => {
-      const { item_name, category, item_price } = req.body;
+      const { item_name, category, item_price, discount } = req.body;
       const formattedItemName = item_name.replace(/\s+/g, "-").toLowerCase();
       const formattedCategory = category.replace(/\s+/g, "-").toLowerCase(); // Format category name
       const createdDate = new Date();
@@ -322,6 +322,7 @@ async function run() {
           category: formattedCategory,
           item_price,
           createdDate,
+          discount: true,
         };
 
         const result = await MenuItemsCollection.insertOne(newItem);
