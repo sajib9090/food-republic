@@ -151,6 +151,18 @@ const SelectOrders = () => {
     return sum + itemTotal;
   }, 0);
 
+  const totalPriceWithOutDiscount = tableWiseCart?.reduce(
+    (sum, currentItem) => {
+      if (!currentItem.discount) {
+        const itemTotal =
+          currentItem.item_price_per_unit * currentItem.item_quantity;
+        return sum + itemTotal;
+      }
+      return sum;
+    },
+    0
+  );
+
   const handleMemberShip = () => {
     setNumber(number);
     if (number) {
@@ -181,7 +193,8 @@ const SelectOrders = () => {
 
   const handleApply = () => {
     if (availableDiscount && memberShipDiscount) {
-      const discount = (totalPrice * memberShipDiscount) / 100;
+      const discount =
+        ((totalPrice - totalPriceWithOutDiscount) * memberShipDiscount) / 100;
       setTotalDiscount(discount);
     }
   };
@@ -608,7 +621,7 @@ const SelectOrders = () => {
                               <button>{memberShipDiscount}%</button>
                               <button
                                 onClick={handleApply}
-                                className="bg-gray-200 px-2 "
+                                className="bg-gray-200 px-2 hover:bg-gray-800 hover:text-white"
                               >
                                 Apply
                               </button>
@@ -621,16 +634,36 @@ const SelectOrders = () => {
                             </div>
                           )}
                           {availableDiscount && totalDiscount ? (
-                            <div className="flex justify-end mt-2">
-                              <h1 className="flex text-lg font-extrabold">
-                                After Discount:{" "}
-                                <span className="ml-4">
-                                  <CurrencyFormatter
-                                    value={totalPrice - totalDiscount}
-                                  />
-                                </span>
-                              </h1>
-                            </div>
+                            <>
+                              <div className="flex justify-end mt-3">
+                                <h1 className="flex text-lg font-extrabold text-red-500">
+                                  No Discount Amount:{" "}
+                                  <span className="ml-4">
+                                    <CurrencyFormatter
+                                      value={totalPriceWithOutDiscount}
+                                    />
+                                  </span>
+                                </h1>
+                              </div>
+                              <div className="flex justify-end mt-1">
+                                <h1 className="flex text-lg font-extrabold text-green-600">
+                                  Total Discount:{" "}
+                                  <span className="ml-4">
+                                    <CurrencyFormatter value={totalDiscount} />
+                                  </span>
+                                </h1>
+                              </div>
+                              <div className="flex justify-end mt-1">
+                                <h1 className="flex text-lg font-extrabold">
+                                  After Discount:{" "}
+                                  <span className="ml-4">
+                                    <CurrencyFormatter
+                                      value={totalPrice - totalDiscount}
+                                    />
+                                  </span>
+                                </h1>
+                              </div>
+                            </>
                           ) : null}
                         </div>
                         <div>

@@ -26,6 +26,7 @@ const CartReducer = (state, action) => {
         item_quantity: 1,
         table_name: tableName,
         staffName: staffName,
+        discount: item.discount,
       };
 
       return {

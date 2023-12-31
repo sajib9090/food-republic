@@ -101,10 +101,13 @@ const MaintainMenuItems = () => {
     e.preventDefault();
     const name = e.target.name.value;
     const price = e.target.price.value;
+    const discountValue = e.target.discountValue.value;
+
     if ((name && price > 0) || price == 0) {
       setEditLoading(true);
       const data = {
         item_name: name,
+        discount: discountValue == "yes" ? true : false,
         item_price: parseFloat(price),
       };
 
@@ -257,7 +260,9 @@ const MaintainMenuItems = () => {
                   </div>
 
                   {menuItems
-                    ?.filter((item) => item?.category === category.category)
+                    ?.filter(
+                      (menuItem) => menuItem?.category === category.category
+                    )
                     .map((item, i) => (
                       <div
                         key={item._id}
@@ -265,7 +270,7 @@ const MaintainMenuItems = () => {
                       >
                         <div className="flex font-bold text-black text-sm">
                           <div>
-                            <p className="mr-1">{i + 1}.</p>
+                            <p className="">{i + 1}.</p>
                           </div>
                           <div>
                             <p className="wrapped-text capitalize">
@@ -284,7 +289,19 @@ const MaintainMenuItems = () => {
                               <CurrencyFormatter value={item?.item_price} />
                             </button>
                           </div>
-                          <div className="ml-8 flex items-center space-x-4">
+                          <div className="ml-3">
+                            <p className="text-xs">Discount</p>
+                            {item?.discount ? (
+                              <button className="bg-green-600 w-[30px] text-white rounded ml-2">
+                                On
+                              </button>
+                            ) : (
+                              <button className="bg-red-600 w-[30px] text-white rounded ml-2">
+                                Off
+                              </button>
+                            )}
+                          </div>
+                          <div className="ml-2 flex items-center space-x-4">
                             <MdEditSquare
                               onClick={() => handleEdit(item)}
                               title="Edit"
@@ -354,6 +371,17 @@ const MaintainMenuItems = () => {
                         defaultValue={editItem?.item_name}
                         placeholder={editItem?.item_name}
                       />
+                    </div>
+                    <div className="flex flex-col">
+                      <label>Discount Value (Editable)</label>
+
+                      <select
+                        name="discountValue"
+                        className="w-full h-[30px] border-2 border-purple-600 rounded px-2"
+                      >
+                        <option value="yes">Yes</option>
+                        <option value="no">No</option>
+                      </select>
                     </div>
                     <div className="flex flex-col">
                       <label>Item Price (Editable)</label>
