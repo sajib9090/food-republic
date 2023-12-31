@@ -548,7 +548,12 @@ const SelectOrders = () => {
                               .map((item, index) => (
                                 <div
                                   key={item._id}
-                                  className="min-h-[50px] w-full border-b border-gray-300 shadow-md flex items-center justify-between py-2"
+                                  title={item.item_name}
+                                  className={`min-h-[50px] w-full border-b border-gray-300 flex items-center justify-between pl-2 py-2 ${
+                                    item?.discount
+                                      ? "bg-white"
+                                      : "bg-purple-100"
+                                  }`}
                                 >
                                   <div className="flex items-center min-w-[65%]">
                                     <p>{index + 1}.</p>
@@ -594,6 +599,7 @@ const SelectOrders = () => {
                                           handleSingleItemRemove(item)
                                         }
                                         className="text-red-700 h-8 w-8 cursor-pointer mx-2"
+                                        title="remove"
                                       />
                                     </div>
                                   </div>
@@ -636,7 +642,7 @@ const SelectOrders = () => {
                           {availableDiscount && totalDiscount ? (
                             <>
                               <div className="flex justify-end mt-3">
-                                <h1 className="flex text-lg font-extrabold text-red-500">
+                                <h1 className="flex text-lg text-red-500">
                                   No Discount Amount:{" "}
                                   <span className="ml-4">
                                     <CurrencyFormatter
@@ -646,7 +652,7 @@ const SelectOrders = () => {
                                 </h1>
                               </div>
                               <div className="flex justify-end mt-1">
-                                <h1 className="flex text-lg font-extrabold text-green-600">
+                                <h1 className="flex text-lg text-green-600">
                                   Total Discount:{" "}
                                   <span className="ml-4">
                                     <CurrencyFormatter value={totalDiscount} />
