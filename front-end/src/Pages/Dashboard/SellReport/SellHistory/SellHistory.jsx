@@ -15,7 +15,8 @@ const SellHistory = () => {
   const [totalDiscountByMonth, setTotalDiscountByMonth] = useState({});
 
   const [detailsData, setDetailsData] = useState({});
-  // console.log(detailsData);
+  const [averageDailySell, setAverageDailySell] = useState(0);
+
   useEffect(() => {
     const calculateTotals = () => {
       const totalBillResult = findDataByMonth?.reduce((acc, item) => {
@@ -31,10 +32,24 @@ const SellHistory = () => {
       // Set the results as new states
       setTotalBillByMonth(totalBillResult);
       setTotalDiscountByMonth(totalDiscountResult);
+
+      // Calculate the number of days that have passed in the selected month
+      const currentDate = new Date();
+      const currentMonth = currentDate.getMonth() + 1;
+      const [, selectedMonthNumber] = selectedMonth.split("-");
+      const daysPassed =
+        currentMonth === parseInt(selectedMonthNumber)
+          ? currentDate.getDate()
+          : totalDaysInMonth;
+
+      // Calculate the average daily sell
+      const averageDailySell = totalBillResult / daysPassed;
+      // Set the average daily sell as a state
+      setAverageDailySell(averageDailySell);
     };
 
     calculateTotals();
-  }, [findDataByMonth]);
+  }, [findDataByMonth, selectedMonth, totalDaysInMonth]);
 
   const handleSelectDate = () => {
     setSelectedMonth(selectedMonth);
@@ -237,9 +252,7 @@ const SellHistory = () => {
                             Average Daily Sell:{" "}
                           </div>
                           <div className="w-[30%] text-left">
-                            <CurrencyFormatter
-                              value={totalBillByMonth / totalDaysInMonth}
-                            />
+                            <CurrencyFormatter value={averageDailySell} />
                           </div>
                         </div>
                         <hr />
