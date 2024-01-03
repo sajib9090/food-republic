@@ -482,6 +482,7 @@ async function run() {
 
     //sold invoice api
     // this api can serve data by the help of id, date, start & end date, item name and month
+
     app.get("/api/get-sold-invoices", async (req, res) => {
       const invoiceId = req.query.id;
       const startDate = req.query.startDate;
@@ -489,6 +490,7 @@ async function run() {
       const date = req.query.date;
       const itemName = req.query.itemName;
       const month = req.query.month;
+      const frId = req.query.frId; // New query parameter for fr_id
 
       try {
         let query = {};
@@ -496,7 +498,7 @@ async function run() {
         if (invoiceId) {
           // If ID parameter is provided, search for void invoice by ID
           const result = await SoldItemsCollection.findOne({
-            _id: new ObjectId(invoiceId), // Corrected variable name to invoiceId
+            _id: new ObjectId(invoiceId),
           });
 
           if (!result) {
@@ -509,7 +511,6 @@ async function run() {
           });
         } else if (date) {
           // If date is provided, filter by that specific date
-          // Remove the time part to filter by the entire day
           const startOfDay = new Date(date);
           const endOfDay = new Date(date);
           endOfDay.setHours(23, 59, 59, 999);
@@ -517,7 +518,6 @@ async function run() {
           query = { createdDate: { $gte: startOfDay, $lte: endOfDay } };
         } else if (startDate && endDate) {
           // If both startDate and endDate are provided, filter by date range
-          // Remove the time part to filter by the entire day
           const startOfDay = new Date(startDate);
           const endOfDay = new Date(endDate);
           endOfDay.setHours(23, 59, 59, 999);
@@ -526,15 +526,18 @@ async function run() {
         } else if (month) {
           // If month is provided, filter by that specific month
           const startOfMonth = new Date(month);
-          startOfMonth.setDate(1); // Set the day to the first day of the month
+          startOfMonth.setDate(1);
           startOfMonth.setHours(0, 0, 0, 0);
 
           const endOfMonth = new Date(month);
-          endOfMonth.setMonth(endOfMonth.getMonth() + 1); // Move to the next month
-          endOfMonth.setDate(0); // Set the day to the last day of the month
+          endOfMonth.setMonth(endOfMonth.getMonth() + 1);
+          endOfMonth.setDate(0);
           endOfMonth.setHours(23, 59, 59, 999);
 
           query = { createdDate: { $gte: startOfMonth, $lte: endOfMonth } };
+        } else if (frId) {
+          // If frId is provided, filter by fr_id
+          query = { fr_id: parseInt(frId) }; // Assuming fr_id is stored as an integer
         }
 
         if (itemName) {
@@ -555,6 +558,7 @@ async function run() {
           .send("Error retrieving sold invoices from the database");
       }
     });
+
     app.get("/api/get-sold-invoices-by-month-details", async (req, res) => {
       const month = req.query.month;
 
@@ -676,20 +680,60 @@ async function run() {
       }
     );
 
+    // app.post("/api/post-sold-invoices", async (req, res) => {
+    //   const { table_name, served_by, items, total_bill, total_discount } =
+    //     req.body;
+    //   const createdDate = new Date();
+
+    //   try {
+    //     // Calculate the total price for each item
+    //     const itemsWithTotalPrice = items.map((item) => ({
+    //       ...item,
+    //       total_price: item.item_price_per_unit * item.item_quantity,
+    //     }));
+
+    //     // Insert the new document
+    //     const result = await SoldItemsCollection.insertOne({
+    //       table_name,
+    //       served_by,
+    //       items: itemsWithTotalPrice,
+    //       total_bill,
+    //       total_discount,
+    //       createdDate,
+    //     });
+
+    //     res.json({
+    //       message: "Data added successfully",
+    //       insertedId: result.insertedId,
+    //     });
+    //   } catch (error) {
+    //     console.error("Database Insertion Error:", error);
+    //     res.status(500).send("Error inserting data into the database");
+    //   }
+    // });
+
     app.post("/api/post-sold-invoices", async (req, res) => {
       const { table_name, served_by, items, total_bill, total_discount } =
         req.body;
       const createdDate = new Date();
 
       try {
+        // Fetch the latest fr_id from the database
+        const latestSoldInvoice = await SoldItemsCollection.findOne(
+          {},
+          { sort: { fr_id: -1 } }
+        );
+        const latestFrId = latestSoldInvoice ? latestSoldInvoice.fr_id : 0;
+
         // Calculate the total price for each item
         const itemsWithTotalPrice = items.map((item) => ({
           ...item,
           total_price: item.item_price_per_unit * item.item_quantity,
         }));
 
-        // Insert the new document
+        // Insert the new document with an incremented fr_id
         const result = await SoldItemsCollection.insertOne({
+          fr_id: latestFrId + 1,
           table_name,
           served_by,
           items: itemsWithTotalPrice,
