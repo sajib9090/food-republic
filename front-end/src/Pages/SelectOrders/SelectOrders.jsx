@@ -259,6 +259,7 @@ const SelectOrders = () => {
       if (result.isConfirmed) {
         const soldItems = {
           table_name: tableName,
+          member: memberShipDiscount ? member.mobile : null,
           served_by: staffValidation,
           items: invoiceData,
           total_bill: totalPrice,
@@ -278,6 +279,8 @@ const SelectOrders = () => {
               });
               const memberData = {
                 total_discount: parseFloat(totalDiscount),
+                total_spent: parseFloat(totalPrice),
+                invoices_code: res?.data?.insertedId,
               };
               if (totalDiscount && member) {
                 axios
