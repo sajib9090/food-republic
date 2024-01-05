@@ -713,8 +713,14 @@ async function run() {
     // });
 
     app.post("/api/post-sold-invoices", async (req, res) => {
-      const { table_name, served_by, items, total_bill, total_discount } =
-        req.body;
+      const {
+        table_name,
+        served_by,
+        items,
+        total_bill,
+        total_discount,
+        member,
+      } = req.body;
       const createdDate = new Date();
 
       try {
@@ -734,6 +740,7 @@ async function run() {
         // Insert the new document with an incremented fr_id
         const result = await SoldItemsCollection.insertOne({
           fr_id: latestFrId + 1,
+          member,
           table_name,
           served_by,
           items: itemsWithTotalPrice,
@@ -1111,6 +1118,18 @@ async function run() {
         const currentTotalDiscount = member.total_discount || 0; // If total_discount is undefined, assume 0
         const newTotalDiscount = updatedFields.total_discount || 0; // If total_discount is not provided in the request body, assume 0
         updatedFields.total_discount = currentTotalDiscount + newTotalDiscount;
+
+        const currentTotalSpent = member.total_spent || 0;
+        const newTotalSpent = updatedFields.total_spent || 0;
+        updatedFields.total_spent = currentTotalSpent + newTotalSpent;
+
+        // Append new invoices_code values to the existing array or create a new array
+        updatedFields.invoices_code = [
+          ...(member.invoices_code || []), // Previous values
+          ...(Array.isArray(updatedFields.invoices_code)
+            ? updatedFields.invoices_code
+            : [updatedFields.invoices_code]), // New values
+        ];
 
         const updatedMember = await MemberCollection.findOneAndUpdate(
           { mobile: mobileNumber },
