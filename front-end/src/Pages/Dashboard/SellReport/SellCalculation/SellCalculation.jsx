@@ -67,7 +67,7 @@ const SellCalculation = () => {
   }, [allSoldData]);
 
   return (
-    <div className="max-w-3xl mx-auto">
+    <div className="max-w-5xl mx-auto">
       <h1 className="text-center font-semibold text-lg mt-4">
         Select a date first
       </h1>
@@ -91,7 +91,9 @@ const SellCalculation = () => {
           Total Invoice Found: <span>{allSoldData && allSoldData?.length}</span>
         </h1>
       </div>
-      <h1 className="text-base font-bold text-center">Date: {selectedDate}</h1>
+      <h1 className="text-base font-bold text-center mb-2">
+        Date: {selectedDate}
+      </h1>
 
       <>
         {allSoldData && allSoldData?.length > 0 ? (
@@ -106,6 +108,7 @@ const SellCalculation = () => {
                   items={item.items}
                   totalBill={item.total_bill}
                   totalDiscount={item.total_discount}
+                  date={item.createdDate}
                 />
               ))}
 

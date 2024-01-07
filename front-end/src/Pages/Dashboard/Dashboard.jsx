@@ -1,7 +1,6 @@
 import { NavLink, Outlet } from "react-router-dom";
 import { FaSellsy } from "react-icons/fa";
 import { LiaUserSecretSolid } from "react-icons/lia";
-import { MdOutlineStorefront } from "react-icons/md";
 import { FaUserFriends } from "react-icons/fa";
 import { GiNuclearWaste } from "react-icons/gi";
 
@@ -56,18 +55,6 @@ const Dashboard = () => {
         >
           <GiNuclearWaste className="w-6 h-6 mr-1" />
           {"Expense Report"}
-        </NavLink>
-        <NavLink
-          title="Inventory"
-          to={"inventory"}
-          className={({ isActive }) =>
-            isActive
-              ? "text-lg font-bold hover:underline text-blue-600 flex items-center"
-              : "text-lg font-bold flex items-center"
-          }
-        >
-          <MdOutlineStorefront className="w-6 h-6 mr-1" />
-          {"Inventory"}
         </NavLink>
       </div>
 

@@ -150,7 +150,7 @@ const Main = () => {
             />
             <span>
               Hi,{" "}
-              <span className="font-bold capitalize">
+              <span title={user?.email} className="font-bold capitalize">
                 {user?.email?.split("@")[0]}
               </span>
             </span>

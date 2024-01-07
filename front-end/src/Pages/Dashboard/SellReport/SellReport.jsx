@@ -2,6 +2,7 @@ import { NavLink, Outlet } from "react-router-dom";
 import { TbCoinTakaFilled } from "react-icons/tb";
 import { MdOutlineImageSearch } from "react-icons/md";
 import { LiaFunnelDollarSolid } from "react-icons/lia";
+import { MdOutlineManageHistory } from "react-icons/md";
 
 const SellReport = () => {
   const menu = [
@@ -25,6 +26,12 @@ const SellReport = () => {
     },
     {
       id: 4,
+      title: "Sell Summary",
+      link: "sell-summary",
+      icon: <MdOutlineManageHistory className="w-6 h-6" />,
+    },
+    {
+      id: 5,
       title: "Find Void Invoice",
       link: "find-void-invoice",
       icon: <MdOutlineImageSearch className="w-6 h-6" />,

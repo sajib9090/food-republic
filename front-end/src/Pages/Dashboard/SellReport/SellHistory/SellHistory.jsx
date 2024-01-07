@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { RiLoader2Line } from "react-icons/ri";
 import CurrencyFormatter from "../../../../components/CurrencyFormatter/CurrencyFormatter";
+import Chart from "../../../../components/Chart/Chart";
 
 const SellHistory = () => {
   const [selectedMonth, setSelectedMonth] = useState("");
@@ -68,7 +69,7 @@ const SellHistory = () => {
               .get(
                 `${
                   import.meta.env.VITE_API_URL
-                }/api/get-sold-invoices-by-month-details?month=${selectedMonth}`
+                }/api/get-sold-invoices-by-date-details?month=${selectedMonth}`
               )
               .then((response) => {
                 setDetailsData(response.data);
@@ -285,9 +286,7 @@ const SellHistory = () => {
                           <div className="w-[70%] text-left flex items-center">
                             Minimum Sell Day:
                             <div className="ml-2 text-gray-500 text-base">
-                              <span>
-                                ({selectedMonth}-{detailsData?.minTotalDate})
-                              </span>
+                              <span>({detailsData?.minTotalDate})</span>
                             </div>
                           </div>
                           <div className="w-[30%] text-left">
@@ -299,9 +298,7 @@ const SellHistory = () => {
                           <div className="w-[70%] text-left flex items-center">
                             Maximum Sell Day:
                             <div className="ml-2 text-gray-500 text-base">
-                              <span>
-                                ({selectedMonth}-{detailsData?.maxTotalDate})
-                              </span>
+                              <span>({detailsData?.maxTotalDate})</span>
                             </div>
                           </div>
                           <div className="w-[30%] text-left">
@@ -348,20 +345,24 @@ const SellHistory = () => {
                               }
                             >
                               <td className="border border-gray-300 text-center p-4 text-black">
-                                {selectedMonth}-{item._id}
-                              </td>
-                              <td className="border border-gray-300 text-center p-4 text-black">
-                                <CurrencyFormatter value={item.total_bill} />
+                                {item._id}
                               </td>
                               <td className="border border-gray-300 text-center p-4 text-black">
                                 <CurrencyFormatter
-                                  value={item.total_discount}
+                                  value={item.daily_total_sell}
+                                />
+                              </td>
+                              <td className="border border-gray-300 text-center p-4 text-black">
+                                <CurrencyFormatter
+                                  value={item.daily_total_discount}
                                 />
                               </td>
                             </tr>
                           ))}
                         </table>
                       </div>
+                      {/* chart */}
+                      <Chart data={detailsData?.dailyTotals} />
                     </>
                   )}
                 </>

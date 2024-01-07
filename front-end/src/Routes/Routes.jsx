@@ -11,7 +11,6 @@ import ExpenseReport from "../Pages/Dashboard/ExpenseReport/ExpenseReport";
 const Sell = lazy(() => import("../Pages/Sell/Sell"));
 const SelectOrders = lazy(() => import("../Pages/SelectOrders/SelectOrders"));
 const Dashboard = lazy(() => import("../Pages/Dashboard/Dashboard"));
-const Inventory = lazy(() => import("../Pages/Dashboard/Inventory/Inventory"));
 const SellReport = lazy(() =>
   import("../Pages/Dashboard/SellReport/SellReport")
 );
@@ -63,8 +62,8 @@ const AddStaff = lazy(() =>
 const StaffSellRecord = lazy(() =>
   import("../Pages/Dashboard/StaffRecord/StaffSellRecord/StaffSellRecord")
 );
-const Supplier = lazy(() =>
-  import("../Pages/Dashboard/Inventory/Supplier/Supplier")
+const SellSummary = lazy(() =>
+  import("../Pages/Dashboard/SellReport/SellSummary/SellSummary")
 );
 
 export const router = createBrowserRouter([
@@ -174,24 +173,6 @@ export const router = createBrowserRouter([
             ],
           },
           {
-            path: "inventory",
-            element: (
-              <Suspense fallback={<PrimaryLoader />}>
-                <Inventory />
-              </Suspense>
-            ),
-            children: [
-              {
-                path: "supplier",
-                element: (
-                  <Suspense fallback={<PrimaryLoader />}>
-                    <Supplier />
-                  </Suspense>
-                ),
-              },
-            ],
-          },
-          {
             path: "sell-report",
             element: (
               <Suspense fallback={<PrimaryLoader />}>
@@ -220,6 +201,14 @@ export const router = createBrowserRouter([
                 element: (
                   <Suspense fallback={<PrimaryLoader />}>
                     <SellHistory />
+                  </Suspense>
+                ),
+              },
+              {
+                path: "sell-summary",
+                element: (
+                  <Suspense fallback={<PrimaryLoader />}>
+                    <SellSummary />
                   </Suspense>
                 ),
               },

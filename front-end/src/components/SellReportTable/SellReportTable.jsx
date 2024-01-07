@@ -2,6 +2,7 @@
 import { useRef } from "react";
 import CurrencyFormatter from "../CurrencyFormatter/CurrencyFormatter";
 import toast from "react-hot-toast";
+import DateFormatter from "../DateFormatter/DateFormatter";
 
 const SellReportTable = ({
   index,
@@ -9,6 +10,7 @@ const SellReportTable = ({
   tableName,
   totalDiscount,
   totalBill,
+  date,
 }) => {
   const invoiceIdRef = useRef(null);
 
@@ -32,8 +34,8 @@ const SellReportTable = ({
   };
 
   return (
-    <div className="min-h-[50px] w-full border border-gray-200 rounded-sm shadow-md mb-1 flex items-center justify-between px-4">
-      <div className="flex">
+    <div className="min-h-[55px] w-full border border-gray-200 rounded-sm shadow-md mb-1 flex items-center px-4">
+      <div className="flex w-[50%] text-left">
         <p className="mr-2">{index + 1}.</p>
         <p>
           invoice id:{" "}
@@ -46,12 +48,23 @@ const SellReportTable = ({
             {id}
           </span>
         </p>
-        <p className="ml-24 capitalize">-{tableName}</p>
       </div>
-      <div>
-        <p>
-          <CurrencyFormatter value={totalBill - totalDiscount} />
-        </p>
+      <div className="w-[20%] text-left">
+        <span className="text-xs text-gray-500">
+          <DateFormatter dateString={date} />
+        </span>
+        <p className="capitalize font-semibold">{tableName}</p>
+      </div>
+      <div className="w-[12%] text-right">
+        <p className="text-xs">Discount</p>
+        <div className="text-red-600 text-xs">
+          <CurrencyFormatter value={totalDiscount} />
+        </div>
+      </div>
+      <div className="w-[18%] text-right">
+        <div className="font-bold">
+          <CurrencyFormatter value={totalBill} />
+        </div>
       </div>
     </div>
   );

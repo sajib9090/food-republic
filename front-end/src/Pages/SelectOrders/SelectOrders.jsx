@@ -441,7 +441,9 @@ const SelectOrders = () => {
                     ? "bg-[#001529] bg-opacity-75 text-white"
                     : index === 1
                     ? "bg-[#aa5f34] bg-opacity-75 text-white"
-                    : "bg-[#457322] bg-opacity-75 text-white"
+                    : index === 2
+                    ? "bg-[#457322] bg-opacity-75 text-white"
+                    : "bg-pink-700 bg-opacity-75 text-white"
                 }`}
               >
                 <HyphenToSpaceConverter inputString={category.category} />
@@ -476,7 +478,9 @@ const SelectOrders = () => {
                             ? "bg-[#001529]"
                             : index == 1
                             ? "bg-[#aa5f34]"
-                            : "bg-[#457322]"
+                            : index == 2
+                            ? "bg-[#457322]"
+                            : "bg-pink-700"
                         }`}
                       >
                         <CurrencyFormatter value={item?.item_price} />

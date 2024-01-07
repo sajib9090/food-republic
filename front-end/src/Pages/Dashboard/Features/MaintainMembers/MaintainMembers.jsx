@@ -6,7 +6,7 @@ import DateFormatter from "../../../../components/DateFormatter/DateFormatter";
 import toast from "react-hot-toast";
 import { Dialog, Transition } from "@headlessui/react";
 import { RiLoader2Line } from "react-icons/ri";
-import CurrencyFormatter2 from "../../../../components/CurrencyFormatter2/CurrencyFormatter2";
+import CurrencyFormatter from "../../../../components/CurrencyFormatter/CurrencyFormatter";
 
 const MaintainMembers = () => {
   const [allMember, setAllMember] = useState([]);
@@ -104,13 +104,13 @@ const MaintainMembers = () => {
                 .map((item, index) => (
                   <div
                     key={item._id}
-                    className="w-full min-h-[55px] border-b border-gray-300 flex justify-between items-center"
+                    className="w-full min-h-[55px] border-b border-gray-300 flex items-center"
                   >
-                    <div className="flex items-center text-xs text-gray-500 font-bold min-w-[130px]">
+                    <div className="flex items-center justify-start text-xs text-gray-700 font-bold w-[25%]">
                       <p className="mr-1">{index + 1}.</p>
                       <p className="capitalize">{item.name}</p>
                     </div>
-                    <div className="text-xs text-gray-500">
+                    <div className="text-xs text-gray-500 w-[12.5%] text-left">
                       <p className="text-blue-500 font-semibold">
                         {item.mobile}
                       </p>
@@ -118,15 +118,19 @@ const MaintainMembers = () => {
                         <DateFormatter dateString={item.createdDate} />
                       </div>
                     </div>
-                    <div className="text-xs text-gray-500">
+                    <div className="text-xs text-gray-500 w-[12.5%] text-left">
                       <p className="text-purple-500 font-semibold">
                         Total Spent Money
                       </p>
-                      <div>
-                        <CurrencyFormatter2 value={item?.total_spent} />
+                      <div
+                        className={`font-bold ${
+                          item?.total_spent ? "text-red-600" : "text-green-600"
+                        }`}
+                      >
+                        <CurrencyFormatter value={item?.total_spent} />
                       </div>
                     </div>
-                    <div className="text-xs text-gray-500">
+                    <div className="text-xs text-gray-500 w-[12.5%] text-left">
                       <p className="text-black">Got Total Discount</p>
                       <div
                         className={`${
@@ -135,18 +139,18 @@ const MaintainMembers = () => {
                             : "text-green-600"
                         }`}
                       >
-                        <CurrencyFormatter2
+                        <CurrencyFormatter
                           value={
                             item?.total_discount ? item?.total_discount : 0
                           }
                         />
                       </div>
                     </div>
-                    <div className="text-xs text-gray-500">
+                    <div className="text-xs text-gray-500 w-[12.5%] text-left">
                       <p>Discount Value</p>
-                      <p>{item.discountValue}%</p>
+                      <p className="text-black">{item.discountValue}%</p>
                     </div>
-                    <div>
+                    <div className="w-[15%] text-left">
                       <p>
                         Invoices ID (
                         {item
@@ -169,7 +173,7 @@ const MaintainMembers = () => {
                         ))}
                       </div>
                     </div>
-                    <div className="flex items-center space-x-4">
+                    <div className="flex items-center justify-end space-x-4 w-[10%]">
                       <div>
                         <FaEdit
                           onClick={() => handleEdit(item)}
