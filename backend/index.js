@@ -559,35 +559,117 @@ async function run() {
       }
     });
 
-    app.get("/api/get-sold-invoices-by-month-details", async (req, res) => {
-      const month = req.query.month;
+    app.get("/api/get-sold-invoices-summary", async (req, res) => {
+      const startDate = req.query.startDate;
+      const endDate = req.query.endDate;
 
       try {
-        if (!month) {
-          return res
-            .status(400)
-            .json({ message: "Month parameter is required" });
+        let query = {};
+
+        if (startDate && endDate) {
+          // If both startDate and endDate are provided, filter by date range
+          const startOfDay = new Date(startDate);
+          const endOfDay = new Date(endDate);
+          endOfDay.setHours(23, 59, 59, 999);
+
+          query = { createdDate: { $gte: startOfDay, $lte: endOfDay } };
         }
 
-        const startOfMonth = new Date(month);
-        startOfMonth.setDate(1);
-        startOfMonth.setHours(0, 0, 0, 0);
+        const soldInvoices = await SoldItemsCollection.aggregate([
+          { $match: query },
+          { $unwind: "$items" },
+          {
+            $group: {
+              _id: {
+                date: {
+                  $dateToString: { format: "%Y-%m-%d", date: "$createdDate" },
+                },
+                itemName: "$items.item_name",
+              },
+              totalQuantity: { $sum: "$items.item_quantity" },
+            },
+          },
+          {
+            $group: {
+              _id: "$_id.date",
+              items: {
+                $push: {
+                  itemName: "$_id.itemName",
+                  totalQuantity: "$totalQuantity",
+                },
+              },
+            },
+          },
+        ]).toArray();
 
-        const endOfMonth = new Date(month);
-        endOfMonth.setMonth(endOfMonth.getMonth() + 1);
-        endOfMonth.setDate(0);
-        endOfMonth.setHours(23, 59, 59, 999);
+        return res.json({
+          message: "Sold invoices summary retrieved successfully",
+          soldInvoicesSummary: soldInvoices,
+        });
+      } catch (error) {
+        console.error("Database Retrieval Error:", error);
+        res
+          .status(500)
+          .send("Error retrieving sold invoices summary from the database");
+      }
+    });
 
-        const query = { createdDate: { $gte: startOfMonth, $lte: endOfMonth } };
+    app.get("/api/get-sold-invoices-by-date-details", async (req, res) => {
+      const { month, startDate, endDate } = req.query;
 
-        // Calculate total_bill and total_discount for each day in the specified month
+      try {
+        if ((month && startDate) || (!month && !startDate && !endDate)) {
+          return res.status(400).json({
+            message: "Provide either 'month' or 'startDate' and 'endDate'",
+          });
+        }
+
+        let query = {};
+
+        if (month) {
+          const startOfMonth = new Date(month);
+          startOfMonth.setDate(1);
+          startOfMonth.setHours(0, 0, 0, 0);
+
+          const endOfMonth = new Date(month);
+          endOfMonth.setMonth(endOfMonth.getMonth() + 1);
+          endOfMonth.setDate(0);
+          endOfMonth.setHours(23, 59, 59, 999);
+
+          query = { createdDate: { $gte: startOfMonth, $lte: endOfMonth } };
+        } else if (startDate && endDate) {
+          const startOfStartDate = new Date(startDate);
+          startOfStartDate.setHours(0, 0, 0, 0);
+
+          const endOfEndDate = new Date(endDate);
+          endOfEndDate.setHours(23, 59, 59, 999);
+
+          query = {
+            createdDate: { $gte: startOfStartDate, $lte: endOfEndDate },
+          };
+        }
+
         const aggregatePipeline = [
           { $match: query },
           {
             $group: {
               _id: { $dayOfMonth: "$createdDate" },
-              total_bill: { $sum: "$total_bill" },
-              total_discount: { $sum: "$total_discount" },
+              daily_total_sell: { $sum: "$total_bill" },
+              daily_total_discount: { $sum: "$total_discount" },
+              createdDate: { $first: "$createdDate" }, // Include createdDate in the result
+            },
+          },
+          {
+            $project: {
+              _id: {
+                $dateToString: {
+                  format: "%Y-%m-%d",
+                  date: "$createdDate",
+                },
+              },
+              createdDate: 1, // Include createdDate in the result
+              daily_total_sell: 1,
+              daily_total_discount: 1,
             },
           },
           {
@@ -599,28 +681,25 @@ async function run() {
           aggregatePipeline
         ).toArray();
 
-        // Find the date with the highest total_bill
         let maxTotal = 0;
         let maxTotalDate;
-
-        // Find the date with the lowest total_bill
         let minTotal = Infinity;
         let minTotalDate;
 
         dailyTotals.forEach((dailyTotal) => {
-          if (dailyTotal.total_bill > maxTotal) {
-            maxTotal = dailyTotal.total_bill;
+          if (dailyTotal.daily_total_sell > maxTotal) {
+            maxTotal = dailyTotal.daily_total_sell;
             maxTotalDate = dailyTotal._id;
           }
 
-          if (dailyTotal.total_bill < minTotal) {
-            minTotal = dailyTotal.total_bill;
+          if (dailyTotal.daily_total_sell < minTotal) {
+            minTotal = dailyTotal.daily_total_sell;
             minTotalDate = dailyTotal._id;
           }
         });
 
         return res.json({
-          message: "Sold invoices by month retrieved successfully",
+          message: "Sold invoices by date details retrieved successfully",
           dailyTotals,
           maxTotalDate,
           maxTotal,
@@ -631,7 +710,9 @@ async function run() {
         console.error("Database Retrieval Error:", error);
         res
           .status(500)
-          .send("Error retrieving sold invoices by month from the database");
+          .send(
+            "Error retrieving sold invoices by date details from the database"
+          );
       }
     });
 
@@ -679,38 +760,6 @@ async function run() {
         }
       }
     );
-
-    // app.post("/api/post-sold-invoices", async (req, res) => {
-    //   const { table_name, served_by, items, total_bill, total_discount } =
-    //     req.body;
-    //   const createdDate = new Date();
-
-    //   try {
-    //     // Calculate the total price for each item
-    //     const itemsWithTotalPrice = items.map((item) => ({
-    //       ...item,
-    //       total_price: item.item_price_per_unit * item.item_quantity,
-    //     }));
-
-    //     // Insert the new document
-    //     const result = await SoldItemsCollection.insertOne({
-    //       table_name,
-    //       served_by,
-    //       items: itemsWithTotalPrice,
-    //       total_bill,
-    //       total_discount,
-    //       createdDate,
-    //     });
-
-    //     res.json({
-    //       message: "Data added successfully",
-    //       insertedId: result.insertedId,
-    //     });
-    //   } catch (error) {
-    //     console.error("Database Insertion Error:", error);
-    //     res.status(500).send("Error inserting data into the database");
-    //   }
-    // });
 
     app.post("/api/post-sold-invoices", async (req, res) => {
       const {
@@ -955,15 +1004,13 @@ async function run() {
       }
     });
 
-    app.get("/api/get-expenses-by-month", async (req, res) => {
+    app.get("/api/get-expenses-by-query", async (req, res) => {
       try {
-        // Check if date, month, and sortByTitle parameters are provided in the query
-        const { month } = req.query;
+        const { month, startDate, endDate } = req.query;
 
         let query = {};
 
         if (month) {
-          // If month parameter is provided, add it to the query
           const startOfMonth = new Date(`${month}-01T00:00:00.000Z`);
           const endOfMonth = new Date(
             new Date(startOfMonth).setMonth(startOfMonth.getMonth() + 1) - 1
@@ -973,24 +1020,29 @@ async function run() {
             $gte: startOfMonth,
             $lt: endOfMonth,
           };
+        } else if (startDate && endDate) {
+          // If start and end dates are provided, add them to the query
+          query.createdDate = {
+            $gte: new Date(startDate),
+            $lt: new Date(endDate),
+          };
         }
 
         let pipeline = [
           { $match: query },
-          { $sort: { createdDate: 1 } }, // Sort by createdDate in ascending order
+          { $sort: { createdDate: 1 } },
           {
             $group: {
               _id: {
                 $dateToString: { format: "%Y-%m-%d", date: "$createdDate" },
               },
               expenses: { $push: "$$ROOT" },
-              totalExpenses: { $sum: "$expense_price" }, // Use the correct field name here
+              totalExpenses: { $sum: "$expense_price" },
             },
           },
-          { $sort: { _id: 1 } }, // Sort the result by date in ascending order
+          { $sort: { _id: 1 } },
         ];
 
-        // Execute the aggregation pipeline
         let result = await ExpensesCollection.aggregate(pipeline).toArray();
 
         res.json({
