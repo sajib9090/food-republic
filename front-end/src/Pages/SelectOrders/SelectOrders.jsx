@@ -221,9 +221,9 @@ const SelectOrders = () => {
     }
   };
 
-  const handleCart = (item, tableName, staffName) => {
+  const handleCart = (item, tableName, staffName, orderTime) => {
     if (isStaffSelected) {
-      handleAddToBill(item, tableName, staffName);
+      handleAddToBill(item, tableName, staffName, orderTime);
       toast.success(item.item_name + " added", {
         autoClose: 500,
       });
@@ -455,7 +455,12 @@ const SelectOrders = () => {
                   <div
                     key={item._id}
                     onClick={() => {
-                      handleCart(item, name, staffValidation);
+                      handleCart(
+                        item,
+                        name,
+                        staffValidation,
+                        staff[0]?.createdDate
+                      );
                     }}
                     className="flex justify-between items-center py-4 shadow-md px-2 border-b border-gray-300 cursor-pointer hover:shadow-md hover:bg-gray-200 hover:text-red-700"
                   >

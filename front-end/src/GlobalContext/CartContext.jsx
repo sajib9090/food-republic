@@ -26,8 +26,11 @@ const CartProvider = ({ children }) => {
 
   //add item data inside cart
 
-  const handleAddToBill = (item, tableName, staffName) => {
-    dispatch({ type: "ADD_TO_BILL", payload: { item, tableName, staffName } });
+  const handleAddToBill = (item, tableName, staffName, orderTime) => {
+    dispatch({
+      type: "ADD_TO_BILL",
+      payload: { item, tableName, staffName, orderTime },
+    });
   };
 
   const itemRemove = (item) => {

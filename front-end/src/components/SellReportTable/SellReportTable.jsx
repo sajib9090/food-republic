@@ -11,6 +11,7 @@ const SellReportTable = ({
   totalDiscount,
   totalBill,
   date,
+  serial,
 }) => {
   const invoiceIdRef = useRef(null);
 
@@ -49,19 +50,23 @@ const SellReportTable = ({
           </span>
         </p>
       </div>
-      <div className="w-[20%] text-left">
+      <div className="w-[12%] text-left">
+        <span className="text-xs text-gray-500">Invoice Serial</span>
+        <p className="capitalize font-semibold text-xs">{serial}</p>
+      </div>
+      <div className="w-[15%] text-left">
         <span className="text-xs text-gray-500">
           <DateFormatter dateString={date} />
         </span>
         <p className="capitalize font-semibold">{tableName}</p>
       </div>
-      <div className="w-[12%] text-right">
+      <div className="w-[10%] text-right">
         <p className="text-xs">Discount</p>
         <div className="text-red-600 text-xs">
           <CurrencyFormatter value={totalDiscount} />
         </div>
       </div>
-      <div className="w-[18%] text-right">
+      <div className="w-[13%] text-right">
         <div className="font-bold">
           <CurrencyFormatter value={totalBill} />
         </div>

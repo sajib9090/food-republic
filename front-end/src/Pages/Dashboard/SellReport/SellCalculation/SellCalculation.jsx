@@ -67,7 +67,7 @@ const SellCalculation = () => {
   }, [allSoldData]);
 
   return (
-    <div className="max-w-5xl mx-auto">
+    <div className="max-w-[1050px] mx-auto">
       <h1 className="text-center font-semibold text-lg mt-4">
         Select a date first
       </h1>
@@ -103,12 +103,13 @@ const SellCalculation = () => {
                 <SellReportTable
                   key={item._id}
                   index={index}
-                  id={item._id}
-                  tableName={item.table_name}
-                  items={item.items}
-                  totalBill={item.total_bill}
-                  totalDiscount={item.total_discount}
-                  date={item.createdDate}
+                  id={item?._id}
+                  tableName={item?.table_name}
+                  items={item?.items}
+                  totalBill={item?.total_bill}
+                  totalDiscount={item?.total_discount}
+                  date={item?.createdDate}
+                  serial={item?.fr_id}
                 />
               ))}
 

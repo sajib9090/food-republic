@@ -4,6 +4,7 @@ import { MdDining } from "react-icons/md";
 import { Link } from "react-router-dom";
 import Loader from "../../components/Loader/Loader";
 import { useCartContext } from "../../GlobalContext/CartContext";
+import LiveTimeCounter from "../../components/LiveTimeCounter/LiveTimeCounter";
 
 const Sell = () => {
   const [tableData, setTableData] = useState([]);
@@ -34,6 +35,7 @@ const Sell = () => {
 
     fetchData();
   }, []);
+
   return (
     <>
       {loading ? (
@@ -48,12 +50,15 @@ const Sell = () => {
           <div className="grid grid-cols-4 gap-6">
             {tableData &&
               tableData?.map((table) => {
-                const staffNamesForTable = carts
+                const staffOrdersForTable = carts
                   ?.filter((cart) => cart?.table_name === table?.name)
-                  .map((cart) => cart?.staffName);
+                  .map((cart) => ({
+                    staffName: cart?.staffName,
+                    orderTime: cart?.orderTime,
+                  }));
 
-                const lastStaffName =
-                  staffNamesForTable[staffNamesForTable.length - 1];
+                const lastStaffOrder =
+                  staffOrdersForTable[staffOrdersForTable.length - 1];
 
                 return (
                   <Link
@@ -69,13 +74,20 @@ const Sell = () => {
                     <h1 className="text-lg font-bold capitalize">
                       {table.name}
                     </h1>
-                    {lastStaffName && (
-                      <p className="text-sm text-gray-600 capitalize mt-1">
-                        Pending by{" "}
-                        <span className="text-red-900 font-extrabold">
-                          {lastStaffName}
-                        </span>
-                      </p>
+                    {lastStaffOrder && (
+                      <div className="text-sm text-gray-600 mt-1">
+                        <p className="capitalize text-center">
+                          Pending by{" "}
+                          <span className="text-purple-900 font-extrabold">
+                            {lastStaffOrder.staffName}
+                          </span>
+                        </p>
+                        <div className="text-center text-xs text-red-900 font-medium">
+                          <LiveTimeCounter
+                            startTime={new Date(lastStaffOrder.orderTime)}
+                          />
+                        </div>
+                      </div>
                     )}
                   </Link>
                 );
