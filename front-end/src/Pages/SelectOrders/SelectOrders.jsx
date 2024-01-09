@@ -42,7 +42,6 @@ const SelectOrders = () => {
   const navigate = useNavigate();
 
   const [searchInputValue, setSearchInputValue] = useState("");
-
   //quantity increase and decrease function
   const handleQuantityIncrease = (item) => {
     itemQuantityIncrease(item);
@@ -51,7 +50,6 @@ const SelectOrders = () => {
     itemQuantityDecrease(item);
   };
   //end
-
   //staff validation functions
   const [selectedStaff, setSelectedStaff] = useState("");
   const [triggerEffect, setTriggerEffect] = useState(false);
@@ -196,6 +194,20 @@ const SelectOrders = () => {
       const discount =
         ((totalPrice - totalPriceWithOutDiscount) * memberShipDiscount) / 100;
       setTotalDiscount(discount);
+    }
+  };
+
+  //money back ang get function and state
+  const [gotMoney, setGotMoney] = useState("");
+  const [backMoney, setBackMoney] = useState("");
+
+  const handleGotMoney = (e) => {
+    const value = e.target.value;
+    setGotMoney(value);
+    if (totalDiscount) {
+      setBackMoney(parseFloat(value) - (totalPrice - totalDiscount));
+    } else {
+      setBackMoney(parseFloat(value) - totalPrice);
     }
   };
 
@@ -628,12 +640,30 @@ const SelectOrders = () => {
                     {tableWiseCart?.length > 0 ? (
                       <div>
                         <div>
-                          <h1 className="flex justify-end font-medium text-lg mt-2 mb-2">
-                            Total Bill:{" "}
-                            <span className="ml-4">
-                              <CurrencyFormatter value={totalPrice} />
+                          <div className="max-w-[28.5rem] ml-auto flex justify-end font-medium text-lg mt-2 mb-2">
+                            <span className="w-[65%] text-right">
+                              Got Money from Customer ৳:
                             </span>
-                          </h1>
+                            <span className="w-[35%] flex items-center justify-end">
+                              <input
+                                onChange={handleGotMoney}
+                                value={gotMoney}
+                                type="number"
+                                className="h-[30px] w-[100px] border-2 border-red-300 rounded px-2"
+                              />
+                            </span>
+                          </div>
+                          <div className="max-w-xs ml-auto flex items-center my-2 text-lg font-semibold text-black">
+                            <span className="w-[50%] text-right">
+                              Total Bill:
+                            </span>
+                            <span className="w-[50%] text-right">
+                              <CurrencyFormatter
+                                value={totalPrice - totalDiscount}
+                              />
+                            </span>
+                          </div>
+
                           {availableDiscount ? (
                             <div className="flex justify-end space-x-4">
                               <button>{memberShipDiscount}%</button>
@@ -653,36 +683,53 @@ const SelectOrders = () => {
                           )}
                           {availableDiscount && totalDiscount ? (
                             <>
-                              <div className="flex justify-end mt-3">
-                                <h1 className="flex text-lg text-red-500">
-                                  No Discount Amount:{" "}
-                                  <span className="ml-4">
-                                    <CurrencyFormatter
-                                      value={totalPriceWithOutDiscount}
-                                    />
-                                  </span>
-                                </h1>
+                              <div className="max-w-xs ml-auto flex items-center mt-1 text-base text-purple-600">
+                                <span className="w-[50%] text-right">
+                                  No Discount Amount:
+                                </span>
+                                <span className="w-[50%] text-right">
+                                  <CurrencyFormatter
+                                    value={totalPrice - totalDiscount}
+                                  />
+                                </span>
                               </div>
-                              <div className="flex justify-end mt-1">
-                                <h1 className="flex text-lg text-green-600">
-                                  Total Discount:{" "}
-                                  <span className="ml-4">
-                                    <CurrencyFormatter value={totalDiscount} />
-                                  </span>
-                                </h1>
+                              <div className="max-w-xs ml-auto flex items-center mt-1 text-base text-blue-600">
+                                <span className="w-[50%] text-right">
+                                  Total Discount:
+                                </span>
+                                <span className="w-[50%] text-right">
+                                  <CurrencyFormatter
+                                    value={totalPrice - totalDiscount}
+                                  />
+                                </span>
                               </div>
-                              <div className="flex justify-end mt-1">
-                                <h1 className="flex text-lg font-extrabold">
-                                  After Discount:{" "}
-                                  <span className="ml-4">
-                                    <CurrencyFormatter
-                                      value={totalPrice - totalDiscount}
-                                    />
-                                  </span>
-                                </h1>
+                              <div className="max-w-xs ml-auto flex items-center mt-1 text-lg font-extrabold">
+                                <span className="w-[50%] text-right">
+                                  After Discount:
+                                </span>
+                                <span className="w-[50%] text-right">
+                                  <CurrencyFormatter
+                                    value={totalPrice - totalDiscount}
+                                  />
+                                </span>
                               </div>
                             </>
                           ) : null}
+
+                          <div
+                            className={`max-w-xs ml-auto flex items-center justify-end text-lg font-bold ${
+                              backMoney < 0
+                                ? "text-red-600 border-t-2 border-red-600"
+                                : "border-t-2 border-green-600 text-green-600"
+                            } `}
+                          >
+                            <span className="w-[50%] text-right">
+                              Customer will get:
+                            </span>
+                            <span className="w-[50%] text-right">
+                              <CurrencyFormatter value={backMoney} />
+                            </span>
+                          </div>
                         </div>
                         <div>
                           <p
@@ -732,8 +779,11 @@ const SelectOrders = () => {
                         Customer Copy
                       </button>
                       <button
+                        disabled={backMoney < 0}
                         onClick={() => handleSell(tableWiseCart, name)}
-                        className="h-[40px] w-[130px] bg-red-600 rounded-md text-white"
+                        className={`h-[40px] w-[130px] bg-red-600 rounded-md text-white ${
+                          backMoney < 0 ? "cursor-not-allowed" : ""
+                        }`}
                       >
                         Payment Done
                       </button>
