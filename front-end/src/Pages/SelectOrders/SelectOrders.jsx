@@ -286,7 +286,7 @@ const SelectOrders = () => {
             if (res?.data?.insertedId) {
               Swal.fire({
                 title: "Success!",
-                html: `Items have been sold<br>ID: ${res.data.insertedId}`,
+                html: `Items have been sold<br>ID: ${res.data.fr_id}`,
                 icon: "success",
               });
               const memberData = {
@@ -305,7 +305,7 @@ const SelectOrders = () => {
                   .then((response) => {
                     if (response) {
                       handleRemoveAllSoldCart(tableName);
-                      navigate(`${res.data.insertedId}`);
+                      navigate(`${res.data.fr_id}`);
 
                       axios
                         .delete(
@@ -333,7 +333,7 @@ const SelectOrders = () => {
                   });
               } else {
                 handleRemoveAllSoldCart(tableName);
-                navigate(`${res.data.insertedId}`);
+                navigate(`${res.data.fr_id}`);
                 axios
                   .delete(
                     `${
@@ -658,9 +658,7 @@ const SelectOrders = () => {
                               Total Bill:
                             </span>
                             <span className="w-[50%] text-right">
-                              <CurrencyFormatter
-                                value={totalPrice - totalDiscount}
-                              />
+                              <CurrencyFormatter value={totalPrice} />
                             </span>
                           </div>
 
@@ -689,7 +687,7 @@ const SelectOrders = () => {
                                 </span>
                                 <span className="w-[50%] text-right">
                                   <CurrencyFormatter
-                                    value={totalPrice - totalDiscount}
+                                    value={totalPriceWithOutDiscount}
                                   />
                                 </span>
                               </div>
@@ -699,7 +697,9 @@ const SelectOrders = () => {
                                 </span>
                                 <span className="w-[50%] text-right">
                                   <CurrencyFormatter
-                                    value={totalPrice - totalDiscount}
+                                    value={
+                                      totalPrice - (totalPrice - totalDiscount)
+                                    }
                                   />
                                 </span>
                               </div>

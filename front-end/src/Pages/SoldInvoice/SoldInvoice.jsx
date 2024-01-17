@@ -11,6 +11,7 @@ import toast from "react-hot-toast";
 
 const SoldInvoice = () => {
   const { id } = useParams();
+
   const [soldInvoice, setSoldInvoice] = useState({});
   // const { handleRemoveAllSoldCart } = useCartContext();
   const componentRef = useRef();
@@ -18,7 +19,7 @@ const SoldInvoice = () => {
 
   // console.log(soldInvoice);
   let grandTotal =
-    soldInvoice.items && Array.isArray(soldInvoice.items)
+    soldInvoice?.items && Array.isArray(soldInvoice?.items)
       ? soldInvoice.items.reduce(
           (sum, item) => sum + (item.total_price || 0),
           0
@@ -28,7 +29,7 @@ const SoldInvoice = () => {
   useEffect(() => {
     if (id !== undefined && id !== null) {
       axios
-        .get(`${import.meta.env.VITE_API_URL}/api/get-sold-invoices?id=${id}`)
+        .get(`${import.meta.env.VITE_API_URL}/api/get-sold-invoices?frId=${id}`)
         .then((res) => {
           setSoldInvoice(res.data.soldInvoice);
         })
@@ -41,7 +42,6 @@ const SoldInvoice = () => {
   }, [id]);
 
   const handleBackToSell = () => {
-    // handleRemoveAllSoldCart(tableCode);
     navigate("/sell");
   };
   return (
@@ -67,7 +67,7 @@ const SoldInvoice = () => {
             <p>+8801903 390050</p>
           </div>
           <p className="text-[8px] text-black mt-2">
-            InvoiceID: <span className="ml-1">{soldInvoice?._id}</span>
+            InvoiceID: <span className="ml-1">{soldInvoice?.fr_id}</span>
           </p>
           <p className="text-xs mb-1">
             <DateFormatter dateString={soldInvoice?.createdDate} />
@@ -98,9 +98,9 @@ const SoldInvoice = () => {
               >
                 <div className="flex items-center w-[70%]">
                   <p className="mr-1">{index + 1}.</p>
-                  <p className="wrapped-text3 capitalize">
+                  <div className="wrapped-text3 capitalize">
                     <HyphenToSpaceConverter inputString={item?.item_name} />
-                  </p>
+                  </div>
                 </div>
                 <div className="flex items-center justify-end w-[30%]">
                   <div className="flex items-center w-[30%]">

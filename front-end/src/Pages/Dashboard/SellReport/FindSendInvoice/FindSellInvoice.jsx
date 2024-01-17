@@ -16,8 +16,13 @@ const FindSellInvoice = () => {
     setLoading(true);
     e.preventDefault();
     const id = e.target.id.value;
+
     axios
-      .get(`${import.meta.env.VITE_API_URL}/api/get-sold-invoices?id=${id}`)
+      .get(
+        `${import.meta.env.VITE_API_URL}/api/get-sold-invoices?${
+          id.length > 23 ? "id=" + id : "frId=" + id
+        }`
+      )
       .then((res) => {
         if (res) {
           setSoldInvoice(res.data.soldInvoice);
@@ -31,22 +36,16 @@ const FindSellInvoice = () => {
       });
   };
 
-  // const totalSum = soldInvoice?.items?.reduce((sum, currentItem) => {
-  //   const itemTotal =
-  //     currentItem.item_price_per_unit * currentItem.item_quantity;
-  //   return sum + itemTotal;
-  // }, 0);
-
   return (
     <div>
       <div className="max-w-md mx-auto mt-6">
-        <p className="text-lg font-bold my-1">Find invoice by id</p>
+        <p className="text-lg font-bold my-1">Find invoice by id or serial</p>
         <form onSubmit={handleSearch}>
           <input
             className="h-[40px] w-full border-2 border-blue-600 rounded px-2"
             type="text"
             name="id"
-            placeholder="Enter id"
+            placeholder="Enter id or serial number"
             required
           />
           <button
@@ -76,9 +75,9 @@ const FindSellInvoice = () => {
               <p className="text-[10px] text-black mt-2">
                 Invoice: <span className="ml-1">{soldInvoice?._id}</span>
               </p>
-              <p className="text-xs mb-1">
+              <div className="text-xs mb-1">
                 <DateFormatter dateString={soldInvoice?.createdDate} />
-              </p>
+              </div>
               <p className="capitalize text-xs">{soldInvoice?.table_name}</p>
             </div>
             <div className="mt-2 px-1">
@@ -97,9 +96,9 @@ const FindSellInvoice = () => {
                   >
                     <div className="flex items-center">
                       <p className="mr-1">{index + 1}.</p>
-                      <p className="wrapped-text3">
+                      <div className="wrapped-text3">
                         <HyphenToSpaceConverter inputString={item?.item_name} />
-                      </p>
+                      </div>
                     </div>
                     <div className="flex items-center">
                       <p className="mr-1">

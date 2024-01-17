@@ -24,12 +24,12 @@ const SellReport = () => {
       link: "sell-history",
       icon: <LiaFunnelDollarSolid className="w-6 h-6" />,
     },
-    {
-      id: 4,
-      title: "Sell Summary",
-      link: "sell-summary",
-      icon: <MdOutlineManageHistory className="w-6 h-6" />,
-    },
+    // {
+    //   id: 4,
+    //   title: "Sell Summary",
+    //   link: "sell-summary",
+    //   icon: <MdOutlineManageHistory className="w-6 h-6" />,
+    // },
     {
       id: 5,
       title: "Find Void Invoice",
