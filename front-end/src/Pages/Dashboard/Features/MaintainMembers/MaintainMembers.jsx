@@ -15,6 +15,19 @@ const MaintainMembers = () => {
   let [loading, setLoading] = useState(false);
   let [memberLoading, setMemberLoading] = useState(true);
 
+  const fetchData = async () => {
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_URL}/api/get-members`
+      );
+      setAllMember(response.data.members);
+      setMemberLoading(false);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      setMemberLoading(false);
+    }
+  };
+
   // console.log(allMember);
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -46,6 +59,7 @@ const MaintainMembers = () => {
         })
         .finally(() => {
           setLoading(false);
+          fetchData();
         });
     }
   };
@@ -66,30 +80,20 @@ const MaintainMembers = () => {
         .then((res) => {
           if (res) {
             toast.success("Deleted");
+            fetchData();
           }
         })
         .catch((err) => {
           console.log(err);
+          fetchData();
         });
     }
   };
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get(
-          `${import.meta.env.VITE_API_URL}/api/get-members`
-        );
-        setAllMember(response.data.members);
-        setMemberLoading(false);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-        setMemberLoading(false);
-      }
-    };
-
     fetchData();
-  }, [allMember]);
+  }, []);
+
   return (
     <div className="flex w-full gap-4">
       <div className="w-full min-h-screen shadow-md px-4">
@@ -153,13 +157,12 @@ const MaintainMembers = () => {
                     <div className="w-[15%] text-left">
                       <p>
                         Invoices ID (
-                        {item
-                          ? item?.invoices_code
-                            ? item?.invoices_code?.length
-                            : 0
-                          : "null"}
+                        {item && item?.invoices_code
+                          ? item?.invoices_code?.filter(Boolean).length
+                          : 0}
                         )
                       </p>
+
                       <div className="text-xs text-gray-500 overflow-y-scroll w-[300px]">
                         {item?.invoices_code?.map((item, index) => (
                           <span
