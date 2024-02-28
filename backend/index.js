@@ -201,6 +201,36 @@ async function run() {
 
     //this api can serve data by the help of id, date, start date, end date, sold-invoice_id and also table_name
     //void routes
+    app.post("/api/post-void-invoice", async (req, res) => {
+      const {
+        sold_invoice_id,
+        table_name,
+        item,
+        previous_quantity,
+        void_quantity,
+      } = req.body;
+      const createdAt = new Date();
+
+      try {
+        // Insert the new void invoice document
+        const result = await VoidInvoicesCollection.insertOne({
+          sold_invoice_id,
+          table_name,
+          item,
+          previous_quantity,
+          void_quantity,
+          createdAt,
+        });
+
+        res.json({
+          message: "Void invoice added successfully",
+          insertedId: result.insertedId,
+        });
+      } catch (error) {
+        console.error("Database Insertion Error:", error);
+        res.status(500).send("Error inserting void invoice into the database");
+      }
+    });
     app.get("/api/get-void-invoices", (req, res) =>
       getVoidInvoices(req, res, VoidInvoicesCollection)
     );

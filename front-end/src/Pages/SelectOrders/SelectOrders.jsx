@@ -244,20 +244,69 @@ const SelectOrders = () => {
     }
   };
 
-  //
-  // Updated handleCross function
+  const [temporaryRemovedItems, setTemporaryRemovedItems] = useState([]);
+  const [originalTableWiseCart, setOriginalTableWiseCart] = useState([]);
+  const [filteredTableWiseCart, setFilteredTableWiseCart] = useState([]);
+
+  useEffect(() => {
+    setOriginalTableWiseCart(tableWiseCart);
+    setFilteredTableWiseCart(tableWiseCart);
+  }, [tableWiseCart]);
+
   const handleCross = (item) => {
-    const updatedTableWiseCart = tableWiseCart.map((cartItem) => {
-      if (cartItem._id === item._id) {
-        return { ...cartItem, showDeleteTag: !cartItem.showDeleteTag };
+    setTemporaryRemovedItems((prevItems) => [...prevItems, item]);
+  };
+
+  useEffect(() => {
+    const updatedFilteredCart = originalTableWiseCart.filter(
+      (item) => !temporaryRemovedItems.includes(item)
+    );
+    setFilteredTableWiseCart(updatedFilteredCart);
+  }, [temporaryRemovedItems, originalTableWiseCart]);
+
+  const kitchenTotalPrice = filteredTableWiseCart?.reduce(
+    (sum, currentItem) => {
+      const itemTotal =
+        currentItem.item_price_per_unit * currentItem.item_quantity;
+      return sum + itemTotal;
+    },
+    0
+  );
+
+  const handleReload = () => {
+    setTemporaryRemovedItems([]);
+    setFilteredTableWiseCart(originalTableWiseCart);
+  };
+
+  const handleKitchenDecrease = (item) => {
+    if (item?.item_quantity > 1) {
+      const updatedCart = filteredTableWiseCart?.map((cartItem) => {
+        if (cartItem?._id === item?._id) {
+          return {
+            ...cartItem,
+            item_quantity: cartItem?.item_quantity - 1,
+          };
+        }
+        return cartItem;
+      });
+      setFilteredTableWiseCart(updatedCart);
+    }
+  };
+  const handleKitchenIncrease = (item) => {
+    const updatedCart = filteredTableWiseCart?.map((cartItem) => {
+      if (cartItem?._id === item?._id) {
+        return {
+          ...cartItem,
+          item_quantity: cartItem?.item_quantity + 1,
+        };
       }
       return cartItem;
     });
-
-    setTableWiseCart(updatedTableWiseCart);
+    setFilteredTableWiseCart(updatedCart);
   };
 
   // handle sell
+  const [sellLoading, setSellLoading] = useState(false);
   const handleSell = (invoiceData, tableName) => {
     Swal.fire({
       title: "Are you sure?",
@@ -269,6 +318,7 @@ const SelectOrders = () => {
       confirmButtonText: "Yes",
     }).then((result) => {
       if (result.isConfirmed) {
+        setSellLoading(true);
         const soldItems = {
           table_name: tableName,
           member: memberShipDiscount ? member.mobile : null,
@@ -284,6 +334,7 @@ const SelectOrders = () => {
           )
           .then((res) => {
             if (res?.data?.insertedId) {
+              setSellLoading(false);
               Swal.fire({
                 title: "Success!",
                 html: `Items have been sold<br>ID: ${res.data.fr_id}`,
@@ -355,7 +406,9 @@ const SelectOrders = () => {
             }
           })
           .catch((err) => {
-            console.log(err);
+            if (err) {
+              toast.error("Something went wrong", { autoClose: 100 });
+            }
           });
       }
     });
@@ -765,6 +818,7 @@ const SelectOrders = () => {
                   {tableWiseCart?.length > 0 ? (
                     <div className="text-center space-x-4 my-4">
                       <button
+                        onMouseEnter={handleReload}
                         onClick={() => setIsModalOpen(!isModalOpen)}
                         className="h-[40px] w-[130px] bg-blue-500 rounded-md text-white"
                       >
@@ -779,13 +833,20 @@ const SelectOrders = () => {
                         Customer Copy
                       </button>
                       <button
-                        disabled={backMoney < 0}
+                        disabled={backMoney < 0 || sellLoading}
                         onClick={() => handleSell(tableWiseCart, name)}
                         className={`h-[40px] w-[130px] bg-red-600 rounded-md text-white ${
                           backMoney < 0 ? "cursor-not-allowed" : ""
                         }`}
                       >
-                        Payment Done
+                        {sellLoading ? (
+                          <div className="flex justify-center items-center">
+                            Please Wait..
+                            <RiLoader2Line className="h-6 w-6 animate-spin text-white" />
+                          </div>
+                        ) : (
+                          "Payment Done"
+                        )}
                       </button>
                     </div>
                   ) : null}
@@ -847,44 +908,49 @@ const SelectOrders = () => {
                         </div>
                       </div>
                       <div>
-                        {tableWiseCart
+                        {filteredTableWiseCart
                           ?.sort((a, b) =>
                             a.item_name.localeCompare(b.item_name)
                           )
                           .map((item, index) => (
                             <div
-                              onClick={() => handleCross(item)}
                               key={item._id}
                               className="min-h-[30px] w-full border-b border-gray-500 flex items-center cursor-pointer justify-between text-[10px]"
                             >
-                              <div className="flex items-center min-w-[70%]">
+                              <div
+                                onClick={() => handleCross(item)}
+                                className="flex items-center min-w-[65%]"
+                              >
                                 <p className="">{index + 1}.</p>
-                                {item.showDeleteTag ? (
-                                  <del className=" wrapped-text capitalize">
-                                    <HyphenToSpaceConverter
-                                      inputString={item.item_name}
-                                    />
-                                  </del>
-                                ) : (
-                                  <p className="wrapped-text capitalize">
-                                    <HyphenToSpaceConverter
-                                      inputString={item.item_name}
-                                    />
-                                  </p>
-                                )}
+                                <p className="wrapped-text capitalize">
+                                  <HyphenToSpaceConverter
+                                    inputString={item.item_name}
+                                  />
+                                </p>
                               </div>
-                              <div className="flex items-center min-w-[30%]">
-                                <div className="ml-auto flex min-w-[30%]">
-                                  <button className=" text-black">
-                                    {item.item_quantity}
+                              <div className="flex items-center min-w-[35%]">
+                                <div className="ml-auto flex min-w-[40%]">
+                                  <button
+                                    onClick={() => handleKitchenDecrease(item)}
+                                    className="px-1 bg-gray-200"
+                                  >
+                                    -
                                   </button>
-                                  <button className="ml-2 text-black">-</button>
+                                  <button className=" text-black px-1">
+                                    {item?.item_quantity}
+                                  </button>
+                                  <button
+                                    onClick={() => handleKitchenIncrease(item)}
+                                    className="px-1 bg-gray-200"
+                                  >
+                                    +
+                                  </button>
                                 </div>
-                                <div className="text-black min-w-[70%] flex justify-end">
+                                <div className="text-black min-w-[60%] flex justify-end">
                                   <CurrencyFormatter
                                     value={
-                                      item.item_price_per_unit *
-                                      item.item_quantity
+                                      item?.item_price_per_unit *
+                                      item?.item_quantity
                                     }
                                   />
                                 </div>
@@ -896,7 +962,7 @@ const SelectOrders = () => {
                         <h1 className="flex justify-end">
                           Total Price:{" "}
                           <span className="ml-2">
-                            <CurrencyFormatter value={totalPrice} />
+                            <CurrencyFormatter value={kitchenTotalPrice} />
                           </span>
                         </h1>
                       </div>
