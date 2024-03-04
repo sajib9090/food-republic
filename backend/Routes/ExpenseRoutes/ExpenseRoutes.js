@@ -1,5 +1,3 @@
-const express = require("express");
-const router = express.Router();
 const { ObjectId } = require("mongodb");
 
 async function getExpenses(req, res, ExpensesCollection) {

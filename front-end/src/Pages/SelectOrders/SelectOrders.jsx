@@ -16,6 +16,7 @@ import toast from "react-hot-toast";
 import { RiLoader2Line } from "react-icons/ri";
 import { CiCircleRemove } from "react-icons/ci";
 import { FiLoader } from "react-icons/fi";
+import { PiBagFill } from "react-icons/pi";
 
 const SelectOrders = () => {
   const { name } = useParams();
@@ -307,8 +308,8 @@ const SelectOrders = () => {
 
   // handle sell
   const [sellLoading, setSellLoading] = useState(false);
-  const handleSell = (invoiceData, tableName) => {
-    Swal.fire({
+  const handleSell = async (invoiceData, tableName) => {
+    const result = await Swal.fire({
       title: "Are you sure?",
       text: `Want to set payment done?`,
       icon: "question",
@@ -316,9 +317,12 @@ const SelectOrders = () => {
       confirmButtonColor: "#001529",
       cancelButtonColor: "#d33",
       confirmButtonText: "Yes",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        setSellLoading(true);
+    });
+
+    if (result.isConfirmed) {
+      setSellLoading(true);
+
+      try {
         const soldItems = {
           table_name: tableName,
           member: memberShipDiscount ? member.mobile : null,
@@ -327,91 +331,111 @@ const SelectOrders = () => {
           total_bill: totalPrice,
           total_discount: totalDiscount,
         };
-        axios
-          .post(
-            `${import.meta.env.VITE_API_URL}/api/post-sold-invoices`,
-            soldItems
-          )
-          .then((res) => {
-            if (res?.data?.insertedId) {
-              setSellLoading(false);
-              Swal.fire({
-                title: "Success!",
-                html: `Items have been sold<br>ID: ${res.data.fr_id}`,
-                icon: "success",
-              });
-              const memberData = {
-                total_discount: parseFloat(totalDiscount),
-                total_spent: parseFloat(totalPrice),
-                invoices_code: res?.data?.insertedId,
-              };
-              if (totalDiscount && member) {
-                axios
-                  .patch(
-                    `${import.meta.env.VITE_API_URL}/api/update-member/${
-                      member?.mobile
-                    }`,
-                    memberData
-                  )
-                  .then((response) => {
-                    if (response) {
-                      handleRemoveAllSoldCart(tableName);
-                      navigate(`${res.data.fr_id}`);
 
-                      axios
-                        .delete(
-                          `${
-                            import.meta.env.VITE_API_URL
-                          }/api/delete-order?table_code=${name}`
-                        )
-                        .then((res) => {
-                          if (res) {
-                            setTriggerEffect(!triggerEffect);
-                            setIsStaffSelected(false);
-                          }
-                        })
-                        .catch((err) => {
-                          if (err) {
-                            toast.error("Something went wrong", {
-                              autoClose: 100,
-                            });
-                          }
-                        });
-                    }
-                  })
-                  .catch((err) => {
-                    console.log(err);
-                  });
-              } else {
-                handleRemoveAllSoldCart(tableName);
-                navigate(`${res.data.fr_id}`);
-                axios
-                  .delete(
-                    `${
-                      import.meta.env.VITE_API_URL
-                    }/api/delete-order?table_code=${name}`
-                  )
-                  .then((res) => {
-                    if (res) {
-                      setTriggerEffect(!triggerEffect);
-                      setIsStaffSelected(false);
-                    }
-                  })
-                  .catch((err) => {
-                    if (err) {
-                      toast.error("Something went wrong", { autoClose: 100 });
-                    }
-                  });
+        const sellResponse = await axios.post(
+          `${import.meta.env.VITE_API_URL}/api/post-sold-invoices`,
+          soldItems
+        );
+
+        if (sellResponse?.data?.insertedId) {
+          setSellLoading(false);
+
+          await Swal.fire({
+            title: "Success!",
+            html: `Items have been sold<br>ID: ${sellResponse.data.fr_id}`,
+            icon: "success",
+          });
+
+          const memberData = {
+            total_discount: parseFloat(totalDiscount),
+            total_spent: parseFloat(totalPrice),
+            invoices_code: sellResponse?.data?.insertedId,
+          };
+
+          if (totalDiscount && member) {
+            const updateMemberResponse = await axios.patch(
+              `${import.meta.env.VITE_API_URL}/api/update-member/${
+                member?.mobile
+              }`,
+              memberData
+            );
+
+            if (updateMemberResponse) {
+              handleRemoveAllSoldCart(tableName);
+              navigate(`${sellResponse.data.fr_id}`);
+
+              const deleteOrderResponse = await axios.delete(
+                `${
+                  import.meta.env.VITE_API_URL
+                }/api/delete-order?table_code=${name}`
+              );
+
+              if (deleteOrderResponse) {
+                setTriggerEffect(!triggerEffect);
+                setIsStaffSelected(false);
               }
             }
-          })
-          .catch((err) => {
-            if (err) {
-              toast.error("Something went wrong", { autoClose: 100 });
+          } else {
+            handleRemoveAllSoldCart(tableName);
+            navigate(`${sellResponse.data.fr_id}`);
+
+            const deleteOrderResponse = await axios.delete(
+              `${
+                import.meta.env.VITE_API_URL
+              }/api/delete-order?table_code=${name}`
+            );
+
+            if (deleteOrderResponse) {
+              setTriggerEffect(!triggerEffect);
+              setIsStaffSelected(false);
             }
-          });
+          }
+        }
+      } catch (error) {
+        console.error("Error:", error);
+        toast.error("Something went wrong", { autoClose: 100 });
       }
-    });
+    }
+  };
+
+  const [isOpenInputField, setIsOpenInputField] = useState(false);
+  const [commentInput, setCommentInput] = useState("");
+  const [commentError, setCommentError] = useState("");
+  const [commentLength, setCommentLength] = useState(0);
+  const [commentLoading, setCommentLoading] = useState(false);
+
+  const handleComment = async (data) => {
+    const commentData = {
+      comment: commentInput,
+      staff: staff[0]?.staff_name,
+      table: name,
+      items: data,
+    };
+
+    setCommentLoading(true);
+
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL}/api/comment/add`,
+        commentData
+      );
+
+      if (response) {
+        handleRemoveAllSoldCart(name);
+        navigate("/sell");
+        const deleteOrderResponse = await axios.delete(
+          `${import.meta.env.VITE_API_URL}/api/delete-order?table_code=${name}`
+        );
+        if (deleteOrderResponse) {
+          setTriggerEffect(!triggerEffect);
+          setIsStaffSelected(false);
+        }
+      }
+    } catch (error) {
+      setCommentError(error?.response?.data);
+    } finally {
+      setCommentLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -693,6 +717,66 @@ const SelectOrders = () => {
                     {tableWiseCart?.length > 0 ? (
                       <div>
                         <div>
+                          <button
+                            onClick={() =>
+                              setIsOpenInputField(!isOpenInputField)
+                            }
+                            title="Remove all"
+                            className="my-2 rounded p-2 flex items-center bg-gradient-to-r from-red-600 to-yellow-600 text-white"
+                          >
+                            Remove all
+                            <PiBagFill className="ml-2 h-5 w-5 text-gray-200" />
+                          </button>
+                          {isOpenInputField ? (
+                            <form
+                              onSubmit={(e) => {
+                                e.preventDefault();
+                                handleComment(tableWiseCart);
+                              }}
+                              className="flex flex-col items-start"
+                            >
+                              <textarea
+                                required
+                                onChange={(e) => {
+                                  setCommentInput(e.target.value);
+                                  setCommentError(commentInput?.length > 199);
+                                  setCommentLength(commentInput?.length + 1);
+                                }}
+                                value={commentInput}
+                                className={`px-2 py-1 h-[150px] w-[350px] rounded border-2 border-gray-300 ${
+                                  commentError ? "border-2 border-red-600" : ""
+                                }`}
+                                type="text"
+                                placeholder="write comment"
+                              />
+                              <p className="text-gray-400 text-[12px]">
+                                characters: {commentLength}{" "}
+                                <span className="text-red-600">(max: 200)</span>
+                              </p>
+                              <p className="text-red-600">{commentError}</p>
+                              <button
+                                type="submit"
+                                disabled={
+                                  commentError ||
+                                  !commentInput ||
+                                  commentLoading
+                                }
+                                className={`bg-gray-300 flex items-center justify-center text-black rounded mt-1 h-[40px] w-[120px] ${
+                                  commentError ||
+                                  !commentInput ||
+                                  commentLoading
+                                    ? "bg-red-600 text-white cursor-not-allowed"
+                                    : ""
+                                }`}
+                              >
+                                {commentLoading ? (
+                                  <RiLoader2Line className="animate-spin w-6 h-5" />
+                                ) : (
+                                  "Submit"
+                                )}
+                              </button>
+                            </form>
+                          ) : null}
                           <div className="max-w-[28.5rem] ml-auto flex justify-end font-medium text-lg mt-2 mb-2">
                             <span className="w-[65%] text-right">
                               Got Money from Customer ৳:

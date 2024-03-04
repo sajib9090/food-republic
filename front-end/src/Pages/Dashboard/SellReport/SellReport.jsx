@@ -3,6 +3,7 @@ import { TbCoinTakaFilled } from "react-icons/tb";
 import { MdOutlineImageSearch } from "react-icons/md";
 import { LiaFunnelDollarSolid } from "react-icons/lia";
 import { MdOutlineManageHistory } from "react-icons/md";
+import { MdSmsFailed } from "react-icons/md";
 
 const SellReport = () => {
   const menu = [
@@ -35,6 +36,12 @@ const SellReport = () => {
       title: "Find Void Invoice",
       link: "find-void-invoice",
       icon: <MdOutlineImageSearch className="w-6 h-6" />,
+    },
+    {
+      id: 6,
+      title: "Unsuccessful Sell",
+      link: "unsuccessful-Sell",
+      icon: <MdSmsFailed className="w-6 h-6" />,
     },
   ];
 

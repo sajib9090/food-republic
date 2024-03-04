@@ -10,7 +10,7 @@ const port = process.env.PORT || 8000;
 
 //mongodb
 
-const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
+const { MongoClient, ServerApiVersion } = require("mongodb");
 const {
   getCategory,
   addCategory,
@@ -62,6 +62,10 @@ const {
   addStaff,
   removeStaff,
 } = require("./Routes/StaffRoutes/StaffRoutes");
+const {
+  handleAddComment,
+  handleGetCommentByQuery,
+} = require("./Routes/CommentRouts/CommentRoutes");
 const uri = process.env.DB_URI;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
@@ -96,7 +100,17 @@ async function run() {
     const OrderCollection = client
       .db("FoodRepublic")
       .collection("orderCollection");
+
+    const CommentCollection = client.db("FoodRepublic").collection("comments");
     // API endpoint to get the list of tables from the collection
+
+    app.post("/api/comment/add", (req, res) => {
+      handleAddComment(req, res, CommentCollection);
+    });
+
+    app.get("/api/comments", (req, res) => {
+      handleGetCommentByQuery(req, res, CommentCollection);
+    });
 
     //category routes
     app.get("/api/get-categories", (req, res) =>
