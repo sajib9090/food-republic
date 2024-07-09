@@ -46,7 +46,7 @@ const ItemsProvider = ({ children }) => {
   const getTables = async (url) => {
     try {
       const res = await axios.get(url);
-      setTables(res.data);
+      setTables(res?.data);
     } catch (err) {
       console.error(err);
     }

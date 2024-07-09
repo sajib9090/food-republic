@@ -1,16 +1,17 @@
-import { Fragment, useContext, useState } from "react";
+import { Fragment, useContext, useEffect, useState } from "react";
 import { MdDashboard } from "react-icons/md";
 import { AiFillHome, AiFillPlusSquare } from "react-icons/ai";
 import { MdSell } from "react-icons/md";
 import { FiLogOut } from "react-icons/fi";
 import { MenuFoldOutlined, MenuUnfoldOutlined } from "@ant-design/icons";
 import { Layout, Menu, Button, theme } from "antd";
-import { Link, Outlet } from "react-router-dom";
+import { Link, Outlet, useNavigate } from "react-router-dom";
 import { AuthContext } from "../GlobalContext/AuthProvider";
 import { Dialog, Transition } from "@headlessui/react";
 import axios from "axios";
 import { RiLoader2Line } from "react-icons/ri";
 import toast from "react-hot-toast";
+import { differenceInDays } from "date-fns";
 
 const { Header, Sider, Content } = Layout;
 
@@ -19,6 +20,12 @@ const Main = () => {
   let [isOpen, setIsOpen] = useState(false);
   let [loading, setLoading] = useState(false);
   const { logOut, user } = useContext(AuthContext);
+  const [subscription, setSubscription] = useState({});
+
+  const currentDate = new Date();
+  const expiresAt = new Date(subscription?.expiresAt);
+  const difference = differenceInDays(expiresAt, currentDate);
+  const navigate = useNavigate();
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -54,6 +61,23 @@ const Main = () => {
       toast.error("Fill the field carefully");
     }
   };
+
+  const fetchSubscription = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_URL}/api/subscription`
+      );
+      setSubscription(response?.data);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
+    fetchSubscription();
+  }, []);
   const {
     token: { colorBgContainer },
   } = theme.useToken();
@@ -148,6 +172,23 @@ const Main = () => {
                 height: 64,
               }}
             />
+
+            <span
+              onClick={() => navigate("/payment")}
+              className="font-bold capitalize cursor-pointer"
+            >
+              {difference > 0 ? (
+                <span>
+                  Subscription Will expire in -{" "}
+                  <span className="text-red-600 text-lg">({difference})</span>{" "}
+                  days
+                </span>
+              ) : difference === 0 ? (
+                <span className="text-red-600">Last day of expiration</span>
+              ) : (
+                <span className="text-red-600">Expired</span>
+              )}
+            </span>
             <span>
               Hi,{" "}
               <span title={user?.email} className="font-bold capitalize">

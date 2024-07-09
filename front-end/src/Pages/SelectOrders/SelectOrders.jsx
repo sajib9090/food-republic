@@ -17,6 +17,7 @@ import { RiLoader2Line } from "react-icons/ri";
 import { CiCircleRemove } from "react-icons/ci";
 import { FiLoader } from "react-icons/fi";
 import { PiBagFill } from "react-icons/pi";
+import { differenceInDays } from "date-fns";
 
 const SelectOrders = () => {
   const { name } = useParams();
@@ -438,9 +439,54 @@ const SelectOrders = () => {
     }
   };
 
+  const [subscription, setSubscription] = useState({});
+  const fetchSubscription = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_URL}/api/subscription`
+      );
+      setSubscription(response?.data);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const currentDate = new Date();
+  const expiresAt = new Date(subscription?.expiresAt);
+  const difference = differenceInDays(expiresAt, currentDate);
+
+  useEffect(() => {
+    fetchSubscription();
+  }, []);
+
   useEffect(() => {
     filterTableData(name);
   }, [name, handleAddToBill, itemRemove, carts]);
+
+  if (difference < 1) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-pink-500 to-orange-300">
+        <div className="bg-white p-8 rounded-lg shadow-lg text-center">
+          <h1 className="text-4xl font-bold text-pink-500 mb-6">
+            Subscription Expired
+          </h1>
+          <p className="text-lg mb-8">
+            Your subscription has expired. Please make a payment to continue
+            using our services.
+          </p>
+          <button
+            className="bg-pink-500 text-white py-3 px-6 rounded-lg text-lg transition duration-300 ease-in-out hover:bg-orange-400"
+            onClick={() => navigate("/payment")}
+          >
+            Make Payment
+          </button>
+        </div>
+      </div>
+    );
+  }
   return (
     <div>
       <button

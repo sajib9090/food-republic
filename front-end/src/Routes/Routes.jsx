@@ -68,6 +68,7 @@ const SellSummary = lazy(() =>
 const UnsuccessfulSell = lazy(() =>
   import("../Pages/Dashboard/SellReport/UnsuccessfulSell/UnsuccessfulSell")
 );
+const Payment = lazy(() => import("../Pages/Payment/Payment"));
 
 export const router = createBrowserRouter([
   {
@@ -88,6 +89,14 @@ export const router = createBrowserRouter([
         element: (
           <Suspense fallback={<PrimaryLoader />}>
             <Sell />
+          </Suspense>
+        ),
+      },
+      {
+        path: "/payment",
+        element: (
+          <Suspense fallback={<PrimaryLoader />}>
+            <Payment />
           </Suspense>
         ),
       },

@@ -7,7 +7,6 @@ async function getTables(req, res, tableCollection) {
     const tables = await tableCollection.find({}).toArray();
     res.json({ tables });
   } catch (error) {
-    console.error(error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 }

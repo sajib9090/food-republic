@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const app = express();
 const bodyParser = require("body-parser");
+const cron = require("node-cron");
 app.use(express.json());
 app.use(cors());
 app.use(bodyParser.json());
@@ -10,7 +11,7 @@ const port = process.env.PORT || 8000;
 
 //mongodb
 
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const {
   getCategory,
   addCategory,
@@ -102,7 +103,152 @@ async function run() {
       .collection("orderCollection");
 
     const CommentCollection = client.db("FoodRepublic").collection("comments");
+    const SubscriptionCollection = client
+      .db("FoodRepublic")
+      .collection("subscription");
+
     // API endpoint to get the list of tables from the collection
+    cron.schedule("0 0 10 * *", async () => {
+      try {
+        const subscription = await SubscriptionCollection.findOne();
+
+        if (subscription) {
+          const updatedTotalDue =
+            subscription.total_due + subscription.monthly_bill;
+
+          await SubscriptionCollection.updateOne(
+            { _id: new ObjectId(subscription._id) },
+            { $set: { total_due: updatedTotalDue, updatedAt: new Date() } }
+          );
+
+          console.log("Total due has been updated.");
+        } else {
+          console.log("No subscription found.");
+        }
+      } catch (error) {
+        console.error("Error updating total due:", error);
+      }
+    });
+
+    const checkSubscription = async (req, res, next) => {
+      try {
+        const result = await SubscriptionCollection.findOne();
+
+        const expiresAtDate = new Date(result?.expiresAt);
+        const currentDate = new Date();
+
+        const remainingDays = Math.ceil(
+          (expiresAtDate - currentDate) / (1000 * 60 * 60 * 24)
+        );
+
+        if (remainingDays < 1) {
+          return res.status(403).json({
+            message: `Your subscription is expired.`,
+            dueAmount: result?.total_due || "N/A",
+          });
+        }
+
+        next();
+      } catch (error) {
+        return res.status(500).json({ error: "Internal Server Error" });
+      }
+    };
+
+    app.get("/api/subscription", async (req, res) => {
+      try {
+        const result = await SubscriptionCollection.findOne();
+
+        res.json(result);
+      } catch (error) {
+        console.error("Database Fetching Error:", error);
+        res.status(500).send("Error fetching data from the database");
+      }
+    });
+
+    app.patch("/api/update-subscription-payment-info", async (req, res) => {
+      try {
+        const { method, amount, account } = req.body;
+
+        if (!method || !account || !amount) {
+          return res.status(400).json({
+            message: "Please provide payment method and account details.",
+          });
+        }
+
+        const newData = {
+          type: method,
+          account_no: account,
+          amount: amount,
+          createdAt: new Date(),
+        };
+
+        const subscription = await SubscriptionCollection.findOneAndUpdate(
+          { _id: new ObjectId("666af751e7b8980a27dddfd7") },
+          { $push: { payment_info: newData } },
+          { new: true, upsert: true }
+        );
+
+        if (!subscription) {
+          return res.status(404).json({ message: "Subscription not found" });
+        }
+
+        res.json({
+          message: "Payment info updated",
+        });
+      } catch (error) {
+        console.error("Database Fetching Error:", error);
+        res.status(500).send("Error updating data from the database");
+      }
+    });
+
+    app.patch("/api/update-subscription", async (req, res) => {
+      try {
+        const { day, total_due } = req.body;
+
+        let dayNumber = parseInt(day) || 0;
+        let dueAmount = parseFloat(total_due) || 0;
+
+        const updateFields = {};
+
+        if (dayNumber) {
+          const currentDate = new Date();
+          const expiresAt = new Date(
+            currentDate.setDate(currentDate.getDate() + dayNumber)
+          );
+          expiresAt.setHours(23, 59, 59, 999);
+          updateFields.expiresAt = expiresAt;
+        }
+
+        if (dueAmount) {
+          updateFields.total_due = dueAmount;
+        }
+
+        if (Object.keys(updateFields).length === 0) {
+          return res.status(400).json({ error: "No valid fields to update" });
+        }
+
+        const subscription = await SubscriptionCollection.findOne();
+
+        if (!subscription) {
+          console.log("No subscription found.");
+          return res.status(404).json({ error: "No subscription found" });
+        }
+
+        await SubscriptionCollection.updateOne(
+          { _id: new ObjectId(subscription._id) },
+          { $set: updateFields }
+        );
+
+        console.log(`Subscription updated: ${JSON.stringify(updateFields)}`);
+        res.json({
+          message: "Subscription updated",
+          updatedFields: updateFields,
+        });
+      } catch (error) {
+        console.error("Database Fetching Error:", error);
+        res.status(500).send("Error updating data from the database");
+      }
+    });
 
     app.post("/api/comment/add", (req, res) => {
       handleAddComment(req, res, CommentCollection);
@@ -132,7 +278,7 @@ async function run() {
     );
 
     //menu routes
-    app.get("/api/get-menu-items", (req, res) =>
+    app.get("/api/get-menu-items", checkSubscription, (req, res) =>
       getMenuItems(req, res, MenuItemsCollection)
     );
     app.patch("/api/edit-menu-item/:itemId", (req, res) =>
@@ -155,7 +301,9 @@ async function run() {
     app.post("/api/add-user", (req, res) => addUser(req, res, usersCollection));
 
     //table routes
-    app.get("/api/tables", (req, res) => getTables(req, res, tableCollection));
+    app.get("/api/tables", checkSubscription, (req, res) =>
+      getTables(req, res, tableCollection)
+    );
     app.patch("/api/table/:id", (req, res) =>
       editTableById(req, res, tableCollection)
     );
@@ -182,38 +330,7 @@ async function run() {
     app.post("/api/post-sold-invoices", (req, res) =>
       addSoldInvoices(req, res, SoldItemsCollection)
     );
-    // app.delete("/api/delete-sold-invoice", async (req, res) => {
-    //   const { _id } = req.query;
 
-    //   try {
-    //     if (!_id) {
-    //       return res
-    //         .status(400)
-    //         .json({ message: "_id is required for deletion" });
-    //     }
-
-    //     // Convert the string _id to ObjectId
-    //     const objectId = new ObjectId(_id);
-
-    //     // Delete the document based on _id
-    //     const result = await SoldItemsCollection.deleteOne({ _id: objectId });
-
-    //     if (result.deletedCount === 0) {
-    //       return res
-    //         .status(404)
-    //         .json({ message: "No document found for the specified _id" });
-    //     }
-
-    //     res.json({
-    //       message: `Successfully deleted document with _id: ${_id}`,
-    //     });
-    //   } catch (error) {
-    //     console.error("Database Deletion Error:", error);
-    //     res.status(500).send("Error deleting data from the database");
-    //   }
-    // });
-
-    //this api can serve data by the help of id, date, start date, end date, sold-invoice_id and also table_name
     //void routes
     app.post("/api/post-void-invoice", async (req, res) => {
       const {
